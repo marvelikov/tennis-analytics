@@ -99,4 +99,7 @@ class(data)
 data[, age:= age_calc(birth_date, ranking_date)]
 
 
+# 4. Save final data  -----------------------------------------------------
+
+fwrite(data, "Data/DataRanking.csv")
 
