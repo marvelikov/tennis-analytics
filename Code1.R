@@ -9,7 +9,7 @@ require(data.table)
 
 # 1. Import data ----------------------------------------------------------
 
-# Le data -- sur mon ordi, je devrais le push sur le repository (J'ai pas juste 2010, mais commen?ons avec ?a)
+# Le data -- sur mon ordi, je devrais le push sur le repository (J'ai pas juste 2010, mais commençons avec ça)
 library(readr)
 Players <- read_csv("Data/Players.txt", col_names = FALSE)
 T2010 <- read_csv("Data/T2010.txt", col_names = FALSE)
@@ -20,7 +20,7 @@ colnames(T2010) <- c("ranking_date", "rank", "id", "points")
 
 # 2. Clean data -----------------------------------------------------------
 
-# Un peu de cleaning pour les birth_date -- pas ?l?gant mais bon... J'ai mieux ? faire
+# Un peu de cleaning pour les birth_date -- pas élégant mais bon... J'ai mieux ? faire
 Players$birth_date <- sapply(Players$birth_date, function(d){
   #print(d)
   if(is.na(d)){return(NA)}
@@ -88,10 +88,10 @@ age_calc <- function(birth, now){
 
 # 3. Merge players to ranking ---------------------------------------------
 
-# Faque  le data c'est juste ?a
+# Faque  le data c'est juste ca
 data <- merge(Players, T2010)
 
-# Transforme ?a en data.table
+# Transforme ca en data.table
 data <- data.table(data)
 class(data)
 
