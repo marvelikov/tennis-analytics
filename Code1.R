@@ -1,5 +1,14 @@
 # Here it goes
 
+
+# 0. Load packages --------------------------------------------------------
+
+require(readr)
+require(lubridate)
+require(data.table)
+
+# 1. Import data ----------------------------------------------------------
+
 # Le data -- sur mon ordi, je devrais le push sur le repository (J'ai pas juste 2010, mais commen?ons avec ?a)
 library(readr)
 Players <- read_csv("Data/Players.txt", col_names = FALSE)
@@ -7,6 +16,9 @@ T2010 <- read_csv("Data/T2010.txt", col_names = FALSE)
 
 colnames(Players) <- c("id", "first_name", "family_name", "hand", "birth_date", "country")
 colnames(T2010) <- c("ranking_date", "rank", "id", "points")
+
+
+# 2. Clean data -----------------------------------------------------------
 
 # Un peu de cleaning pour les birth_date -- pas ?l?gant mais bon... J'ai mieux ? faire
 Players$birth_date <- sapply(Players$birth_date, function(d){
@@ -66,11 +78,12 @@ T2010$ranking_date <- sapply(T2010$ranking_date, function(d){
 #})
 
 
+# 3. Merge players to ranking ---------------------------------------------
+
 # Faque  le data c'est juste ?a
 data <- merge(Players, T2010)
 
 # Transforme ?a en data.table
-library(data.table)
 data <- data.table(data)
 data
 
@@ -87,7 +100,6 @@ data
 rd <- as.Date(data$ranking_date)
 bd <- as.Date(data$birth_date)
 
-library(lubridate)
 int <- interval(bd, rd)
 per <- as.period(int)
 
