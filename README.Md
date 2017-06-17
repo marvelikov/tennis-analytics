@@ -1,10 +1,3 @@
----
-title: "README"
-author: "Stéphane Caron/Samuel Perreault"
-date: '2017-06-17'
-output: html_document
----
-
 # Résumé
 
 Mon frere m'a demandé de lui permettre la chose suivante :
