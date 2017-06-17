@@ -2,8 +2,8 @@
 
 # Le data -- sur mon ordi, je devrais le push sur le repository (J'ai pas juste 2010, mais commen?ons avec ?a)
 library(readr)
-Players <- read_csv("C:/Users/Samuel/Dropbox/Projects/Tennis-Fil/Players.txt", col_names = FALSE)
-T2010 <- read_csv("C:/Users/Samuel/Dropbox/Projects/Tennis-Fil/T2010.txt", col_names = FALSE)
+Players <- read_csv("Data/Players.txt", col_names = FALSE)
+T2010 <- read_csv("Data/T2010.txt", col_names = FALSE)
 
 colnames(Players) <- c("id", "first_name", "family_name", "hand", "birth_date", "country")
 colnames(T2010) <- c("ranking_date", "rank", "id", "points")
