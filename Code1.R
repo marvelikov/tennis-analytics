@@ -66,7 +66,6 @@ T2010$ranking_date <- sapply(T2010$ranking_date, function(d){
   paste0(y,"-",m,"-",d)
 })
 
-
 # Pour l'instant je ne les transforme pas en objet `Date`
 
 #Players$birth_date <- sapply(Players$birth_date, function(d){
@@ -77,6 +76,15 @@ T2010$ranking_date <- sapply(T2010$ranking_date, function(d){
 #  as.Date(as.character(d),format="%Y%m%d")
 #})
 
+age_calc <- function(birth, now){
+  birth_dt <- as.Date(birth)
+  now_dt <- as.Date(now)
+  
+  age <- year(now_dt) - year(birth_dt)
+  
+  ifelse(month(now_dt) < month(birth_dt) | (month(now_dt) == month(birth_dt) & day(now_dt) <= day(birth_dt)), age - 1, age)
+}
+
 
 # 3. Merge players to ranking ---------------------------------------------
 
@@ -85,34 +93,10 @@ data <- merge(Players, T2010)
 
 # Transforme ?a en data.table
 data <- data.table(data)
-data
+class(data)
 
-
-# On peut facilement calculer l'?ge en jours....
-data$days <- as.Date(data$ranking_date) - as.Date(data$birth_date)
-
-
-# L?, jusqu'ici tout va bien
-data
-
-
-# Mais ?a look plus avec YYYY years, MM months and DD days ....
-rd <- as.Date(data$ranking_date)
-bd <- as.Date(data$birth_date)
-
-int <- interval(bd, rd)
-per <- as.period(int)
-
-data[,age := per]
-
-# Pourquoi maintenant ?a bug?
-data
-
-
-
-
-# Aussi, les 0H 0M 0S sont fatiguants, je suis rendu l?... (?a ?a marche mais pas juste le call "data")
-data$age[1:5]
+# On calcule l'âge
+data[, age:= age_calc(birth_date, ranking_date)]
 
 
 
