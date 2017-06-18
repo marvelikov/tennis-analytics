@@ -5,6 +5,7 @@
 
 require(shiny)
 require(dplyr)
+require(DT)
 require(shinydashboard)
 require(data.table)
 require(RCurl)
@@ -31,7 +32,38 @@ filtering <- function(age_input, ranking_input, stat_input){
 
 # 3. UI  ------------------------------------------------------------------
 
+ui <- dashboardPage(
+  dashboardHeader(title = "Tennis Ranking"),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("Ranking", tabName = "ranking", icon = icon("dashboard"))
+    )
+  ),
+  dashboardBody(
+    tabItems(
+      tabItem(tabName = "ranking",
+              box(
+                numericInput("age", label = "Age", value = 20, min = 15, max = 75, step = 1),
+                numericInput("ranking", label = "Ranking", value = 30, min = 1, max = 500, step = 1),
+                selectInput("stat", label = "Stat", choices = c("Première entrée" = "entry", "Maximum atteint" = "max"), multiple = FALSE, selected = "entry")
+              ),
+              dataTableOutput("table")
+      )
+    )
+  )
+)
+
 
 # 4. Server ---------------------------------------------------------------
 
+server <- function(input, output, session) {
+  
+  output$table <- DT::renderDataTable({
+    filtering(input$age, input$ranking, input$stat)
+  })
+}
 
+
+# 5. Run App --------------------------------------------------------------
+
+shinyApp(ui, server)
