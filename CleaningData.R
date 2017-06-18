@@ -6,13 +6,13 @@
 require(readr)
 require(lubridate)
 require(data.table)
+require(readr)
 
 # 1. Import data ----------------------------------------------------------
 
 # Le data -- sur mon ordi, je devrais le push sur le repository (J'ai pas juste 2010, mais commençons avec ça)
-library(readr)
-Players <- read_csv("Data/Players.txt", col_names = FALSE)
-T2010 <- read_csv("Data/T2010.txt", col_names = FALSE)
+Players <- read.csv(textConnection(getURL("https://raw.githubusercontent.com/samperochkin/tennis-analytics/master/Data/Players.txt")), header = FALSE)
+T2010 <- read.csv(textConnection(getURL("https://raw.githubusercontent.com/samperochkin/tennis-analytics/master/Data/T2010.txt")), header = FALSE)
 
 colnames(Players) <- c("id", "first_name", "family_name", "hand", "birth_date", "country")
 colnames(T2010) <- c("ranking_date", "rank", "id", "points")
