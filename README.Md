@@ -1,4 +1,4 @@
-# Résumé
+﻿# Résumé
 
 Mon frere m'a demandé de lui permettre la chose suivante :
 Il aimerait être capable d'avoir la réponse à la question "Qui a été classé top R avant l'âge A?"
@@ -13,3 +13,11 @@ Ultimement je pense qu'on peut se partir une page web et mettre de la pub google
 Une page beeeen basic de stats de tennis pour commencer quoi? Quand on est prêt on regarde comment
 ça fonctionne avec le serveur et les pubs google ou autre... Anyways là je dérape.
 
+
+
+
+
+
+# Commentaires
+
+Certains joueurs (au moins un, Watanuki) ont une date de fête erronnées..
