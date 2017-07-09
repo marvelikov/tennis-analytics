@@ -27,8 +27,3 @@ Certains joueurs (au moins un, Watanuki) ont une date de fête erronnées..
 Pour les donnees de match : http://www.tennis-data.co.uk/alldata.php
 
 Et pour un article interressant : http://www.tennisabstract.com/blog/2017/04/04/the-five-big-questions-in-tennis-analytics/
-
-
-# Test
-
-Je teste le concept de branch dans GitHub.
