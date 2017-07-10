@@ -7,5 +7,9 @@
 # 0. Load package ---------------------------------------------------------
 
 require(grid)
+require(readxl)
 
+# 1. Load and rearrange data ----------------------------------------------
+
+data <- read_xlsx("Data/MR-BO-2016.xlsx")
 
