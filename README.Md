@@ -12,3 +12,6 @@ This folder contains all the raw data as well as the R scripts that eventually i
 ## Visualisation
 This folder shows different examples of visualisation regarding tennis data.
 
+## Dev
+For the moment, this folder contains some tests made in order to explore or tests some functions on the data.
+
