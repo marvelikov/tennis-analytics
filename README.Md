@@ -1,11 +1,14 @@
-# Branch graph tournoi
+# Tennis analytics
 
-## Mise en contexte
-Je veux faire une branche pour créer notre fonction qui va grapher notre tableau de tournoi.
-Je test aussi les opérations de branch et tout de GitHub.
+## Preview
+This repo is intented to regroup different analysis that baseicaly link the tennis and the statistics. There are different modeling examples as well as visualition tools.
 
-## Méthodologie
-Je pense qu'il pourrait être bien d'utiliser le package grid pour bâtir un arbre de tournoi. La mécanique en arrière du package est très flexible.
+## Modeling
+This folder provides differents modeling examples using different statistical techniques.
 
-## Exemple pratique
-J'ai mis un exemple pratique du genre de output qu'on voudrait avoir dans le script ExampleNCAA.R. Cet exemple utilise d'ailleurs le pakage grid.
+## Data
+This folder contains all the raw data as well as the R scripts that eventually import and clean tennis data coming from different sources.
+
+## Visualisation
+This folder shows different examples of visualisation regarding tennis data.
+
