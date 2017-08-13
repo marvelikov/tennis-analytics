@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# Here it goes\n\n\n# 0. Load packages --------------------------------------------------------\n\nrequire(readr)\nrequire(lubridate)\nrequire(data.table)\nrequire(readr)\n\n# 1. Import data ----------------------------------------------------------\n\n# Le data -- sur mon ordi, je devrais le push sur le repository (J'ai pas juste 2010, mais commençons avec ça)\nPlayers <- read.csv(textConnection(getURL(\"https://raw.githubusercontent.com/samperochkin/tennis-analytics/master/Data/Players.txt\")), header = FALSE)\nT2010 <- read.csv(textConnection(getURL(\"https://raw.githubusercontent.com/samperochkin/tennis-analytics/master/Data/T2010.txt\")), header = FALSE)\n\ncolnames(Players) <- c(\"id\", \"first_name\", \"family_name\", \"hand\", \"birth_date\", \"country\")\ncolnames(T2010) <- c(\"ranking_date\", \"rank\", \"id\", \"points\")\n\n\n# 2. Clean data -----------------------------------------------------------\n\n# Un peu de cleaning pour les birth_date -- pas élégant mais bon... J'ai mieux ? faire\nPlayers$birth_date <- sapply(Players$birth_date, function(d){\n  #print(d)\n  if(is.na(d)){return(NA)}\n  d <- strsplit(as.character(d), split = \"\")[[1]]\n  \n  if(length(d) < 8){\n    #print(c(d, \" but not complete\"))\n    return(NA)\n  }\n  \n  y <- paste0(d[1],d[2],d[3],d[4])\n  m <- paste0(d[5],d[6])\n  d <- paste0(d[7],d[8])\n  if(m == \"00\" | d == \"00\"){\n    #print(c(y, \" but HEY ----------\"))\n    return(NA)\n  }\n  #print(paste0(y,\"-\",m,\"-\",d), as.Date(paste0(y,\"-\",m,\"-\",d)))\n  paste0(y,\"-\",m,\"-\",d)\n})\n\n\n# M?me principe pour les ranking_date\nT2010$ranking_date <- sapply(T2010$ranking_date, function(d){\n  #print(d)\n  if(is.na(d)){return(NA)}\n  d <- strsplit(as.character(d), split = \"\")[[1]]\n  \n  if(length(d) < 8){\n    print(c(d, \" but not complete\"))\n    return(NA)\n  }\n  \n  y <- paste0(d[1],d[2],d[3],d[4])\n  m <- paste0(d[5],d[6])\n  d <- paste0(d[7],d[8])\n  if(m == \"00\" | d == \"00\"){\n    print(c(y, \" but HEY ----------\"))\n    return(NA)\n  }\n  #print(paste0(y,\"-\",m,\"-\",d))\n  #as.Date(paste0(y,\"-\",m,\"-\",d))\n  paste0(y,\"-\",m,\"-\",d)\n})\n\n# Pour l'instant je ne les transforme pas en objet `Date`\n\n#Players$birth_date <- sapply(Players$birth_date, function(d){\n#  as.Date(as.character(d),format=\"%Y%m%d\")\n#})\n\n#T2010$date <- sapply(T2010$date, function(d){\n#  as.Date(as.character(d),format=\"%Y%m%d\")\n#})\n\nage_calc <- function(birth, now){\n  birth_dt <- as.Date(birth)\n  now_dt <- as.Date(now)\n  \n  age <- year(now_dt) - year(birth_dt)\n  \n  ifelse(month(now_dt) < month(birth_dt) | (month(now_dt) == month(birth_dt) & day(now_dt) <= day(birth_dt)), age - 1, age)\n}\n\n\n# 3. Merge players to ranking ---------------------------------------------\n\n# Faque  le data c'est juste ca\ndata <- merge(Players, T2010)\n\n# Transforme ca en data.table\ndata <- data.table(data)\nclass(data)\n\n# On calcule l'âge\ndata[, age:= age_calc(birth_date, ranking_date)]\n\n\n# 4. Save final data  -----------------------------------------------------\n\nfwrite(data, \"Data/DataRanking.csv\")\n\n",
+    "created" : 1502667083595.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2441235642",
+    "id" : "F7727DC5",
+    "lastKnownWriteTime" : 1502667043,
+    "last_content_update" : 1502667043,
+    "path" : "~/Documents/Projets/tennis-analytics/CleaningData.R",
+    "project_path" : "CleaningData.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
