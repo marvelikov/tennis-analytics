@@ -12,7 +12,7 @@ require(RCurl)
 
 # 1. Import data ----------------------------------------------------------
 
-url <- getURL("https://raw.githubusercontent.com/samperochkin/tennis-analytics/master/Data/DataRanking.csv")
+url <- getURL("https://raw.githubusercontent.com/samperochkin/tennis-analytics/master/Data/Raw/DataRanking.csv")
 data_ranking <- data.table(read.csv(textConnection(url)))
 data_ranking$ranking_date <- as.Date(data_ranking$ranking_date)
 

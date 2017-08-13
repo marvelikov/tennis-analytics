@@ -1,34 +1,17 @@
-# Résumé
+# Tennis analytics
 
-Mon frere m'a demandé de lui permettre la chose suivante :
-Il aimerait être capable d'avoir la réponse à la question "Qui a été classé top R avant l'âge A?"
+## Preview
+This repo is intented to regroup different analysis that baseicaly link the tennis and the statistics. There are different modeling examples as well as visualition tools.
 
-En gros, je me suis dit que c'était simplement faire un subset unique(data[age < A, rank <= R]$name)
+## Modeling
+This folder provides differents modeling examples using different statistical techniques.
 
-(En fait, il voudrait un ranking par meilleur ranking parmi ceux qui répondent au critère...
-donc parmi ceux qui répondent au critère on prend leurs meilleurs ann?e seulement et on fait le
-ranking final avec tout ça. Bref vous voyez le style)
+## Data
+This folder contains all the raw data as well as the R scripts that eventually import and clean tennis data coming from different sources.
 
-Ultimement je pense qu'on peut se partir une page web et mettre de la pub google là-dessus...
-Une page beeeen basic de stats de tennis pour commencer quoi? Quand on est prêt on regarde comment
-ça fonctionne avec le serveur et les pubs google ou autre... Anyways là je dérape.
+## Visualisation
+This folder shows different examples of visualisation regarding tennis data.
 
+## Dev
+For the moment, this folder contains some tests made in order to explore or tests some functions on the data.
 
-
-
-
-
-# Commentaires
-
-Certains joueurs (au moins un, Watanuki) ont une date de fête erronnées..
-
-
-
-Pour les donnees de match : http://www.tennis-data.co.uk/alldata.php
-
-Et pour un article interressant : http://www.tennisabstract.com/blog/2017/04/04/the-five-big-questions-in-tennis-analytics/
-
-
-# Test
-
-Je teste le concept de branch dans GitHub.
