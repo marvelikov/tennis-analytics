@@ -12,7 +12,7 @@ library(tidyverse)
 
 # 1. Import data ----------------------------------------------------------
 
-source("Data/ImportData.R")
+source("Data/R/ImportData.R")
 
 
 # 2. Select variables -----------------------------------------------------
