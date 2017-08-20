@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# Tennis analytics\n\n## Preview\nThis repo is intented to regroup different analysis that baseicaly link the tennis and the statistics. There are different modeling examples as well as visualition tools.\n\n## Modeling\nThis folder provides differents modeling examples using different statistical techniques.\n\n## Data\nThis folder contains all the raw data as well as the R scripts that eventually import and clean tennis data coming from different sources.\n\n## Visualisation\nThis folder shows different examples of visualisation (graphs, Shiny, etc.) regarding tennis data.\n\n",
+    "created" : 1502667698191.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "254473403",
+    "id" : "BB583E24",
+    "lastKnownWriteTime" : 1502667851,
+    "last_content_update" : 1502667851,
+    "path" : "~/Documents/Projets/tennis-analytics/README.Md",
+    "project_path" : "README.Md",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "markdown"
+}

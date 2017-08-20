@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# Shiny application for filtering tennis ranking datset\n\n\n# 0. Load packages --------------------------------------------------------\n\nrequire(shiny)\nrequire(dplyr)\nrequire(DT)\nrequire(shinydashboard)\nrequire(data.table)\nrequire(RCurl)\n\n# 1. Import data ----------------------------------------------------------\n\nurl <- getURL(\"https://raw.githubusercontent.com/samperochkin/tennis-analytics/master/Data/DataRanking.csv\")\ndata_ranking <- data.table(read.csv(textConnection(url)))\ndata_ranking$ranking_date <- as.Date(data_ranking$ranking_date)\n\n# 2. Define filtering function --------------------------------------------\n\nfiltering <- function(age_input, ranking_input, stat_input){\n  data_filtered <- copy(data_ranking)\n  if (stat_input == \"entry\"){\n    data_filtered <- data_filtered[age <= age_input & rank <= ranking_input, .(ranking_date = min(ranking_date, na.rm = TRUE)), id]\n  } else {\n    data_filtered <- data_filtered[age <= age_input & rank <= ranking_input, .(rank = min(rank, na.rm = TRUE)), .(id)]\n    data_filtered <- data.table(left_join(data_filtered, data_ranking, by = c(\"id\", \"rank\")))\n    data_filtered <- data_filtered[, .(ranking_date = min(ranking_date, na.rm = TRUE)), id]\n  }\n  data_filtered <- data.table(left_join(data_filtered, data_ranking, by = c(\"id\", \"ranking_date\")))\n}\n\n# 3. UI  ------------------------------------------------------------------\n\nui <- dashboardPage(\n  dashboardHeader(title = \"Tennis Ranking\"),\n  dashboardSidebar(\n    sidebarMenu(\n      menuItem(\"Ranking\", tabName = \"ranking\", icon = icon(\"dashboard\"))\n    )\n  ),\n  dashboardBody(\n    tabItems(\n      tabItem(tabName = \"ranking\",\n              box(\n                numericInput(\"age\", label = \"Age\", value = 20, min = 15, max = 75, step = 1),\n                numericInput(\"ranking\", label = \"Ranking\", value = 30, min = 1, max = 500, step = 1),\n                selectInput(\"stat\", label = \"Stat\", choices = c(\"Première entrée\" = \"entry\", \"Maximum atteint\" = \"max\"), multiple = FALSE, selected = \"entry\")\n              ),\n              dataTableOutput(\"table\")\n      )\n    )\n  )\n)\n\n\n# 4. Server ---------------------------------------------------------------\n\nserver <- function(input, output, session) {\n  \n  output$table <- DT::renderDataTable({\n    filtering(input$age, input$ranking, input$stat)\n  })\n}\n\n\n# 5. Run App --------------------------------------------------------------\n\nshinyApp(ui, server)\n",
+    "created" : 1502668009308.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "396333",
+    "id" : "397DB295",
+    "lastKnownWriteTime" : 1502667994,
+    "last_content_update" : 1502667994,
+    "path" : "~/Documents/Projets/tennis-analytics/ShinyApp.R",
+    "project_path" : "ShinyApp.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
