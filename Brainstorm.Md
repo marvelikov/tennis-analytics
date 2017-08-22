@@ -28,9 +28,13 @@ On peut probablement en trouver d'autres plus complexes comme les dernières. Ce
 
 - Ça pourrait être nice de faire du clustering sur les joueurs en utilisant différentes stats de ceux-ci. On pourrait voir par la suite qu'est qui serait possible de faire avec ça, mais peut-être que si on est capable de dégager des constats intéressants quant au clustering de différents types de joueurs, cela pourrait éventuellement servir de input à une méthode supervisée. Par exemple, si deux joueurs n'ont pas joué beaucoup de matchs l'un contre l'autre, on pourrait utiliser les matchs d'un joueur contre le même style de joueur. 
 
+ - J'aime l'idée. Notre guy Sipko (2015) a une variable Head-to-head (pour prendre en compte les matchs opposants les deux joueurs). On pourrait aller plus loin et définir des variables qui permettent d'aller chercher plus d'info sur des "games similaires" mettons.
+
+- Une des grandes difficulté ici c'est de prendre en compte les adversaires d'un certain joueur, car ceux-ci ont une influence sur les stats de ce dernier. Si un joueur a perdu au premier/deuxième tour à ses trois premiers tournoi sur gazon, mais que ce fût contre Federer à chaque fois, on doit en prendre compte...
+
 ### Supervised
 
-
+- À date, on a déjà parler des modèles logistique et réseau de neurones pour prédire l'issue d'un match. L'étape suivante est de prédire le résultat de tel ou tel tournoi. Ceci pourrait potentiellement se faire encore avec un réseau de neurones, mais il y a aussi l'option d'utiliser nos modèles de bases et faire beaucoup de simulations (pour voir les scénarios les plus probables). C'est pas pour ajourd'hui de toute façon... On peut penser à d'autres choses qu'on voudrait prédire aussi : le ranking dans 1 an, la probabilité de blessure, le tennis féminin (je crois que ça c'est un must à long terme : intégrer les femmes au projet), ...
 
 
 
