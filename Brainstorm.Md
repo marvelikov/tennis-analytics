@@ -22,7 +22,7 @@ Clairement, il nous faut identifier des variables potentielles pour nourrir nos 
 - Advantage when serving
 - Head-to-head balance (résultats précédents de ces deux joueurs)
 
-On peut probablement en trouver d'autres plus complexes comme les dernières. Certaines que j'ai nommées n'ont pas été utilisées finalement (comme ATP rank, qui ne représente pas vraiment la "forme" d'un certain joueur à un temps précis).
+On peut probablement en trouver d'autres plus complexes comme les dernières. Celles-ci on doit les "créer" de façon ingénieuse (comment quantifier la fatigue : en comptabilisant le nombre de minutes jouées dans les 3 derniers jours par exemple). Certaines variables mentionnées n'ont pas été utilisées finalement (comme ATP rank, qui ne représente pas vraiment la "forme" d'un certain joueur à un temps précis).
 
 ### Unsupervised
 
