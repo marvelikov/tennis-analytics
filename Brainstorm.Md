@@ -1,6 +1,6 @@
 # Brainstorm
 
-C'est dans ce document qu'on pourrait tous mettre nos idées de trucs sur lesquels travailler en fin de semaine. Évidemment, ça serait bien de rester dans la thématique du tennis. J'ai essayé de mettre quelques titres évocateurs afin de classer un peu les idées, mais vous pouvez les modifier/en ajouter.
+C'est dans ce document qu'on pourrait tous mettre nos idées de trucs sur lesquels travailler en fin de semaine. Évidemment, ce serait bien de rester dans la thématique du tennis. J'ai essayé de mettre quelques titres évocateurs afin de classer un peu les idées, mais vous pouvez les modifier/en ajouter.
 
 ## Visualisation
 
@@ -8,7 +8,7 @@ C'est dans ce document qu'on pourrait tous mettre nos idées de trucs sur lesque
 
 ## Modeling
 
-Clairement, il nous faut identifier des variables potentielles pour nourrir nos modèles. D'après mon guy Sipko (2015), les variables suivantes pourraient être intéressante: (c'est une liste longue, un "\" sépare deux variables...)
+Clairement, il nous faut identifier des variables potentielles pour nourrir nos modèles. D'après mon guy Sipko (2015), les variables suivantes pourraient être intéressantes: (c'est une liste longue, un "\" sépare deux variables...)
 
 - ATP rank/points
 - First serve success
