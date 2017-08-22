@@ -1,7 +1,7 @@
 # Tennis analytics
 
-## Preview
-This repo is intented to regroup different analysis that baseicaly link the tennis and the statistics. There are different modeling examples as well as visualition tools.
+## About the project
+This repo is intented to regroup different analysis that basically link tennis and statistics. There are different modeling examples as well as visualition tools.
 
 ## Modeling
 This folder provides differents modeling examples using different statistical techniques.
