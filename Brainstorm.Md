@@ -44,5 +44,5 @@ Pour faire un ranking qui a du sens, on pourrait tout d'abord imiter l'idée de 
 
 Bref, je dis ça pcq un petit shiny vraiment simple qui fait ça ce serait cool. On met ça gratuit avec une petite pub et hop! J'ai développé l'idée pour le genre de ligue ou le nombre de matchs est vraiment aléatoire... Les gars/filles s'appellent et vont jouer comme bon leur semble, mais on peut facilement donner l'option de créer un nombre de tournoi fini et marcher comme dans l'ATP... Je lance ça de même.
 
-
+@stecaron: Cool Sam j'aime l'idée de travailler là-dessus. Devrait pas être un big deal à faire en plus un coup qu'on se crée un compte pour déployer des Shiny. On pourrait même faire dequoi pour que le monde se crée leur compte (je pense que Shiny gère des créations d'accès et tout) pour avoir des vues personnalisées (stats générales, prochain match, analyses des dernières parties, etc) dépendemment de la personne qui se log. 
 
