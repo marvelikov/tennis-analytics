@@ -1,6 +1,7 @@
+# Title: CleanGameByGameData
 # Date: 5 Aout 2017
 # Author: Stephane Caron
-# Subject: Clean tennis game data for clustering analysis
+# Subject: Clean tennis game by game data
 
 
 # Here, I just cleaned the data from JackSackmann in order to organise it by player. 
