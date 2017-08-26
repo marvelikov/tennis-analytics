@@ -32,7 +32,7 @@ data <- import_games(year_from = 2010, year_to = 2017)
 # 2. Point by point data --------------------------------------------------
 
 tournement <- c("ausopen", "frenchopen", "wimbledon", "usopen")
-year <- seq(2012, 2012, 1)
+year <- seq(2011, 2016, 1)
 
 grid <- expand.grid(year, tournement)
 grand_slam <- c(sapply(1:nrow(grid), function(i) {paste0(grid$Var1[i], "-", grid$Var2[i])}))
@@ -45,12 +45,12 @@ import_point_by_point <- function(x){
     data_x[[i]] <- data.table(read.csv(textConnection(import)))
     i <- i + 1
   }
-  data_point_by_point <- rbindlist(data_x)
+  data_point_by_point <- rbindlist(data_x, fill = TRUE, use.names = FALSE)
 }
 
 data_pts_by_pts <- import_point_by_point(x = grand_slam)
 
-save(data_pts_by_pts, file = "Data/Raw/2012_pts_by_pts.RData")
+save(data_pts_by_pts, file = "Data/Raw/pts_by_pts.RData")
 
 import_matches <- function(x){
   i <- 1
