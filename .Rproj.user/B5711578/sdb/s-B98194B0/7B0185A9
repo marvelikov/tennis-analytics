@@ -1,14 +1,14 @@
 {
     "collab_server" : "",
-    "contents" : "# Tennis analytics\n\n## Preview\nThis repo is intented to regroup different analysis that baseicaly link the tennis and the statistics. There are different modeling examples as well as visualition tools.\n\n## Modeling\nThis folder provides differents modeling examples using different statistical techniques.\n\n## Data\nThis folder contains all the raw data as well as the R scripts that eventually import and clean tennis data coming from different sources.\n\n## Visualisation\nThis folder shows different examples of visualisation (graphs, Shiny, etc.) regarding tennis data.\n\n",
+    "contents" : "# Tennis analytics\n\n## About the project\nThis repo is intented to regroup different analysis that basically link tennis and statistics. There are different modeling examples as well as visualition tools.\n\n## Modeling\nThis folder provides differents modeling examples using different statistical techniques.\n\n## Data\nThis folder contains all the raw data as well as the R scripts that eventually import and clean tennis data coming from different sources.\n\n## Visualisation\nThis folder shows different examples of visualisation (graphs, Shiny, etc.) regarding tennis data.\n\n## Dev\nFor the moment, this folder contains some tests made in order to explore or tests some functions on the data.\n",
     "created" : 1499614499778.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "254473403",
+    "hash" : "3918536567",
     "id" : "7B0185A9",
-    "lastKnownWriteTime" : 1502667238,
-    "last_content_update" : 1502667238,
+    "lastKnownWriteTime" : 1503708045,
+    "last_content_update" : 1503708045,
     "path" : "~/Documents/Projets/tennis-analytics/README.Md",
     "project_path" : "README.Md",
     "properties" : {
