@@ -6,10 +6,13 @@ require(readr)
 require(lubridate)
 require(data.table)
 require(readr)
+require(readxl)
 
 # 1. Import data ----------------------------------------------------------
 
-data <- data.table(read_excel("C:/Users/Samuel/Dropbox/Git Projects/tennis-analytics/Data/MR-BO-2016.xlsx"))
+# I import it right from my local directory...
+
+data <- data.table(read_excel("C:/Users/Samuel/Dropbox/Git Projects/tennis-analytics/Data/Raw/MR-BO-2016.xlsx"))
 
 
 
@@ -24,8 +27,9 @@ data[Round == "The Final" & Tournament == "Rogers Masters"]
 
 # Anyways, let get started.. We first want to identify the date of our match and select the ones anterior to it.
 # Note that this is not necessarily required in a real life setting as there exists no matches posterior to it yet...
+# This will serve as our training set
 
-data.anterior <- data[Date <= data[Round == "The Final" & Tournament == "Rogers Masters", Date]]
+data.train <- data[Date <= data[Round == "The Final" & Tournament == "Rogers Masters", Date]]
 
 
 
