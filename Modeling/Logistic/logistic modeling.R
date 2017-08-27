@@ -10,29 +10,15 @@ require(readxl)
 
 # 1. Import data ----------------------------------------------------------
 
-# I import it right from my local directory...
+load("Data/Raw/pts_by_pts.RData")
+data <- data_pts_by_pts
+rm("data_pts_by_pts")
+summary(data)
 
-data <- data.table(read_excel("C:/Users/Samuel/Dropbox/Git Projects/tennis-analytics/Data/Raw/MR-BO-2016.xlsx"))
-
-
-
-
-# Say we want to predict the following game
-
-data[Round == "The Final" & Tournament == "Rogers Masters"]
-
-# The most "basic but yet interesting" model to fit a logistic regression using the history of games...
-# We already have the possibility to use shot-by-shot data, but will restrict ourselves to match-by-match for now.
-# Neural Nets should be where we aim (longterm)
-
-# Anyways, let get started.. We first want to identify the date of our match and select the ones anterior to it.
-# Note that this is not necessarily required in a real life setting as there exists no matches posterior to it yet...
-# This will serve as our training set
-
-data.train <- data[Date <= data[Round == "The Final" & Tournament == "Rogers Masters", Date]]
-
-
-
+load("Data/Raw/data_slam_matches.RData")
+data.matches <- data_slam_matches
+rm("data_slam_matches")
+summary(data.matches)
 
 
 
