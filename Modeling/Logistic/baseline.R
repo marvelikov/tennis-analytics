@@ -61,6 +61,27 @@ data_sum[, perc_points_won := pts_won/pts_tot][, c("pts_won", "pts_tot") := NULL
 # 3. Function to get Baseline table for a given player --------------------
 
 
+matchesOfPlayer <- function(player){
+  player.num <- 1 * data.matches[,player1 == player] + 2 * data.matches[,player2 == player]
+  id <- which(player.num > 0)
+  return(data.table(match_id.number = data.matches$match_id[id], player.num = player.num[id]))
+}
+
+
+player_baseline <- function(player_name) {
+  player_matches <- matchesOfPlayer(player_name)
+  setkey(data_sum, match_id, player)
+  setkey(player_matches, match_id.number, player.num)
+  
+  player_key = unique(data_sum[player_matches, which = TRUE, allow.cartesian = TRUE])
+  player_baseline <- data_sum[player_key]
+  player_baseline
+}
+
+# Exemple:
+
+Fed <- player_baseline(player_name = "Roger Federer")
+Nadal <- player_baseline(player_name = "Rafael Nadal")
 
 
 
@@ -71,47 +92,6 @@ data_sum[, perc_points_won := pts_won/pts_tot][, c("pts_won", "pts_tot") := NULL
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-# la fonction qui calcule le baseline de player pour chaque game
-
-i <- 1
-
-id <- player.matches[i,]$match_id
-player.number <- player.matches[i,]$player
-
-the.match <- data[match_id == id,]
-
-WonPoint <- c(0,diff(as.matrix(the.match[,P2PointsWon,P1PointsWon])[,player.number]))
-the.match <- cbind(the.match,WonPoint)
-
-PtsWon.matrix <- the.match[, .(WonPoint = sum(WonPoint), ServeIndicator][-1,]
-PtsWon.matrix <- the.match[, .(P1WonPoint = sum(P1WonPoint), P2WonPoint = sum(P2WonPoint)), ServeIndicator][-1,]
-
-PtsWon.matrix_gathered <- gather(PtsWon.matrix, key = player, value = PtsWon, -ServeIndicator) %>% 
-  mutate(
-    player = as.numeric(substr(player, 2, 2)),
-    ServeIndicator = player == ServeIndicator
-  ) %>% 
-  select(
-    player,
-    ServeIndicator,
-    PtsWon
-  ) %>% 
-  arrange(
-    player,
-    -ServeIndicator
-  )
 
 
 
