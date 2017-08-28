@@ -26,11 +26,10 @@ rm("data_slam_matches")
 
 
 # new col with who won the point
-P1_won_point <- c(0, diff(data[, P1PointsWon]))
-P2_won_point <- c(0, diff(data[, P2PointsWon]))
-data_summarized <- cbind(data, P1_won_point, P2_won_point)
+data[, P1_won_point := diff(P1PointsWon), by = match_id]
+data[, P2_won_point := diff(P2PointsWon), by = match_id]
 
-data_gathered <- data_summarized %>% 
+data_gathered <- data %>% 
                   filter(
                     ServeIndicator %in% c(1, 2)
                   ) %>% 
