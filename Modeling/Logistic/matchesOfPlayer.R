@@ -1,14 +1,7 @@
 matchesOfPlayer <- function(player){
-  matches <- sapply(1:nrow(data.matches), function(i){
-    w <- which(c(as.character(data.matches[i,player1]) == player, as.character(data.matches[i,player2]) == player))
-    if(length(w) == 0){
-      return(NULL)
-    }else{
-      return(c(i,w))
-    }
-  }, simplify = FALSE)
-  
-  do.call(rbind, matches)
+  player.num <- 1 * data.matches[,player1 == player] + 2 * data.matches[,player2 == player]
+  id <- which(player.num > 0)
+  return(data.table(match_id.number = id, player.num = player.num[id]))
 }
 
 
