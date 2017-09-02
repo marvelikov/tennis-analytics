@@ -22,3 +22,8 @@ summary(data.matches)
 
 
 
+
+test <- data[P1_won_point == 0 & P2_won_point == 0,]
+
+
+
