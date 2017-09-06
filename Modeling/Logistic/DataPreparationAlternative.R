@@ -20,9 +20,19 @@ source("Modeling/Logistic/baseline.R")
 source("Modeling/Logistic/momentumCalculator.R")
 
 
-# On commence par calculer des statistiques cumulatives dans le march
-data[, p1_cum_ace := momentumCalculator(P1Ace), by = match_id]
-data[, p2_cum_ace := cumsum(P2Ace), by = match_id]
+# Les as
+# On remarque que ça ne fait pas directement du sens d'utiliser la fonction
+# dans sa forme actuelle. Il faut isoler les échanges pour lesquels le joueur
+# en question est au service...
+# Ça soulève la question : est-ce que le temps depuis le dernier service
+# devrait avoir un impact?
+
+data[, p1_mom_ace := momentumCalculator(P1Ace), by = match_id]
+data[, p2_mom_ace := momentumCalculator(P2Ace), by = match_id]
+
+# Je suggère qu'on définisse une fonction de momentum unique à chaque variable.
+
+
 data[, p1_cum_winner := cumsum(P1Winner), by = match_id]
 data[, p2_cum_winner := cumsum(P2Winner), by = match_id]
 data[, p1_cum_df := cumsum(P1DoubleFault), by = match_id]
