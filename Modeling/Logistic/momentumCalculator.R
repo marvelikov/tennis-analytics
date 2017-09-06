@@ -1,8 +1,8 @@
-momentumCalculator <- function(vec, fun.name = NULL){
+momentumCalculator <- function(vec, fun.name = ""){
   
   len <- length(vec)
   
-  if(is.null(fun.name) | fun.name == "halving"){
+  if(nchar(fun.name) == 0 | fun.name == "halving"){
     
     w <- 1/2^(0:(len-1))
     
