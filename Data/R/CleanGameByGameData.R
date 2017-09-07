@@ -11,6 +11,7 @@
 
 library(tidyverse)
 library(data.table)
+library(lubridate)
 
 # Import data -------------------------------------------------------------
 
@@ -21,7 +22,7 @@ data <- fread("Data/Raw/data_game_by_game.csv")
 
 # Remove Davis Cup
 data <- subset(data[-grep(pattern = "Davis", x = data$tourney_name),], select = c("surface", "tourney_date", "winner_name", "loser_name", "score", "w_svpt", "w_1stIn", "w_1stWon", "w_2ndWon", "w_bpSaved", "w_bpFaced", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_bpSaved", "l_bpFaced"))
-
+data$tourney_date <- ymd(data$tourney_date)
 
 
 
