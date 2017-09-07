@@ -27,4 +27,4 @@ import_games <- function(year_from, year_to){
 }
 
 data <- import_games(year_from = 2010, year_to = 2017)
-save(data, file = "Data/Raw/game_by_game.RData")
+fwrite(data, "Data/Raw/data_game_by_game.csv")
