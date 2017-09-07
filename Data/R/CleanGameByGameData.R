@@ -7,14 +7,25 @@
 # Here, I just cleaned the data from JackSackmann in order to organise it by player. 
 # We could adapt this script to keep the data by games 
 
-# 0. Load packages --------------------------------------------------------
+# Load packages -----------------------------------------------------------
 
 library(tidyverse)
+library(data.table)
 
-# 1. Import data ----------------------------------------------------------
+# Import data -------------------------------------------------------------
 
-source("Data/R/ImportData.R")
+data <- fread("Data/Raw/data_game_by_game.csv")
 
+
+# Clean data --------------------------------------------------------------
+
+# Remove Davis Cup
+data <- subset(data[-grep(pattern = "Davis", x = data$tourney_name),], select = c("surface", "tourney_date", "winner_name", "loser_name", "score", "w_svpt", "w_1stIn", "w_1stWon", "w_2ndWon", "w_bpSaved", "w_bpFaced", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_bpSaved", "l_bpFaced"))
+
+
+
+
+# Clean data for clustering -----------------------------------------------
 
 # 2. Select variables -----------------------------------------------------
 
