@@ -8,48 +8,42 @@
 # Present Objective -------------------------------------------------------
 ###################
 
-# Understand how KerasR works via the example they give.
-
-##############
-# Installation ------------------------------------------------------------
-############## If necessary....
+# Feed the tennis data to a MLP with the keras package.
 
 
-#install.packages("devtools")
-#devtools::install_github("rstudio/keras")
-
-#library(keras)
-
-#install_tensorflow()
-#install_tensorflow(gpu=TRUE)
-
-
-
-############
-# An exemple --------------------------------------------------------------
-############ From https://www.analyticsvidhya.com/blog/2017/06/getting-started-with-deep-learning-using-keras-in-r/
-
-#loading keras library
 library(keras)
 
-#loading the keras inbuilt mnist dataset
-data<-dataset_mnist()
+###########
+# Import/prepare data -----------------------------------------------------
+###########
 
-#separating train and test file
-train_x<-data$train$x
-train_y<-data$train$y
-test_x<-data$test$x
-test_y<-data$test$y
+data <- fread()
 
+# train vs test (Randomly seperated! To be determined more carefully)
+set.seed(666)
+
+test.pct <- .05
+test.ind <- sample(nrow(data), nrow(data) * .05)
+
+# Need the variable p1_wins to be defined in the data (in the appropriate script)
+train_x <- data[-test.ind, -p1_wins]
+train_y <- data[-test.ind, p1_wins]
+test_x <- data[test.ind, -p1_wins]
+test_y <- data[test.ind, p1_wins]
 rm(data)
 
-# converting a 2D array into a 1D array for feeding into the MLP and normalising the matrix
-train_x <- array(train_x, dim = c(dim(train_x)[1], prod(dim(train_x)[-1]))) / 255
-test_x <- array(test_x, dim = c(dim(test_x)[1], prod(dim(test_x)[-1]))) / 255
+# Normalizing the columns ####****#### does that work with data.frames?
+train_x <- scale(train_x)
+test_x <- scale(test_x)
 
-#converting the target variable to once hot encoded vectors using keras inbuilt function
-train_y<-to_categorical(train_y,10)
-test_y<-to_categorical(test_y,10)
+# We leave the response in numeric...
+#train_y <-
+#test_y <- 
+
+
+### RENDU LA ####
+# Notre model n'a le meme type de response (num vs cat) donc attention pour la suite
+
 
 #defining a keras sequential model
 model <- keras_model_sequential()
