@@ -17,24 +17,25 @@ library(keras)
 # Import/prepare data -----------------------------------------------------
 ###########
 
-data <- fread()
+data <- fread("Data/Cleaned/DataModeling.csv")
 
 # train vs test (Randomly seperated! To be determined more carefully)
 set.seed(666)
 
-test.pct <- .05
-test.ind <- sample(nrow(data), nrow(data) * .05)
+test_pct <- .05
+test_ind <- sample(nrow(data), nrow(data) * .05)
 
 # Need the variable p1_wins to be defined in the data (in the appropriate script)
-train_x <- data[-test.ind, -p1_wins]
-train_y <- data[-test.ind, p1_wins]
-test_x <- data[test.ind, -p1_wins]
-test_y <- data[test.ind, p1_wins]
+train_x <- data[-test_ind, -p1_wins]
+train_y <- data[-test_ind, p1_wins]
+test_x <- data[test_ind, -p1_wins]
+test_y <- data[test_ind, p1_wins]
 rm(data)
 
-# Normalizing the columns ####****#### does that work with data.frames?
-train_x <- scale(train_x)
-test_x <- scale(test_x)
+# Normalize the columns we want to normalize...
+
+train_x <- scale(train_x, center = TRUE)
+test_x <- scale(test_x, center = TRUE)
 
 # We leave the response in numeric...
 #train_y <-
@@ -45,28 +46,31 @@ test_x <- scale(test_x)
 # Notre model n'a le meme type de response (num vs cat) donc attention pour la suite
 
 
-#defining a keras sequential model
+# Initialisation
 model <- keras_model_sequential()
 
-#defining the model with 1 input layer[784 neurons], 1 hidden layer[784 neurons] with dropout rate 0.4 and 1 output layer[10 neurons]
+# One input layer of 1 input layers of 15 nodes, 1 hidden layer of 30 nodes, with dropout rate 0.4 and 1 output layer[10 neurons]
 #i.e number of digits from 0 to 9
 
 model %>%
-  layer_dense(units = 784, input_shape = 784) %>%
-  layer_dropout(rate=0.4)%>%
+  layer_dense(units = 30, input_shape = 15) %>%
+  layer_dropout(rate=0.4) %>%
   layer_activation(activation = 'relu') %>%
-  layer_dense(units = 10) %>%
-  layer_activation(activation = 'softmax')
+  layer_dense(units = 1) %>%
+  layer_activation(activation = 'sigmoid')
 
-#compiling the defined model with metric = accuracy and optimiser as adam.
+# Compile
 model %>% compile(
-  loss = 'categorical_crossentropy',
-  optimizer = 'adam',
-  metrics = c('accuracy')
+  loss = 'binary_crossentropy', # We have 0-1 classification...
+  optimizer = 'adam', # To be investigated
+  metrics = c('accuracy')  
 )
 
-#fitting the model on the training dataset
-model %>% fit(train_x, train_y, epochs = 100, batch_size = 128)
+# Fit
+
+batch_size <- nrow(x_train)
+
+model %>% fit(train_x, train_y, epochs = 100, batch_size = batch_size)
 
 #Evaluating model on the cross validation dataset
 loss_and_metrics <- model %>% evaluate(test_x, test_y, batch_size = 128)
