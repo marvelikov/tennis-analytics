@@ -68,7 +68,7 @@ model %>% compile(
 
 # Fit
 
-batch_size <- nrow(x_train)
+batch_size <- nrow(x_train) # ********************************************
 
 model %>% fit(train_x, train_y, epochs = 100, batch_size = batch_size)
 
