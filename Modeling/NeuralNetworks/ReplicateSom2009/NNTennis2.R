@@ -22,20 +22,21 @@ data <- fread("Data/Cleaned/DataModeling.csv")
 
 # Remove one year to avoid working with rows full of zeros
 data <- data[tourney_date > "2011-01-01",]
+data <- as.matrix(data[,-c(1,2,3,4)])
+colnames(data) <- NULL
 
 # train vs test (Randomly seperated! To be determined more carefully)
 set.seed(667) # watch out not to put 666 in there!
 
 test_pct <- .05
-test_ind <- rep(0,nrow(data))
-test_ind[sample(nrow(data), nrow(data) * .05)] <- 1
+test_ind <- sample(nrow(data), nrow(data) * test_pct)
 
 
 # Need the variable p1_wins to be defined in the data (in the appropriate script)
-train_x <- subset(data, subset = as.logical(1 - test_ind), 5:19)
-train_y <- subset(data, subset = as.logical(1 - test_ind), 20)
-test_x <- subset(data, subset = as.logical(test_ind), 5:19)
-test_y <- subset(data, subset = as.logical(test_ind), 20)
+train_x <- data[-test_ind,1:15]
+train_y <- data[-test_ind,16]
+test_x <- data[test_ind,1:15]
+test_y <- data[test_ind,16]
 #rm(data)
 
 # Normalize the columns we want to normalize...
@@ -76,10 +77,9 @@ model %>% compile(
 model %>% fit(x = train_x, y = train_y, epochs = 50)
 
 #Evaluating model on the cross validation dataset
-loss_and_metrics <- model %>% evaluate(test_x, test_y, batch_size = 128)
+loss_and_metrics <- model %>% evaluate(test_x, test_y)
 
 
 
-get_layer(object = model, name = "dense_2")
 
 
