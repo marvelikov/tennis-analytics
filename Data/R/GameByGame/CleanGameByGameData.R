@@ -132,13 +132,17 @@ data_modeling <- data %>%
                     p2 = loser_name
                   )
 
+data_modeling <- data.table(data_modeling)
+
 new_names <- gsub("w_", "p1_", colnames(data_modeling))
 new_names <- gsub("l_", "p2_", new_names)
-
 colnames(data_modeling) <- new_names
 
-fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
- 
 
-                
+# Swap the columns
+source("Data/R/GameByGame/SwapColumns.R")
+data_modeling <- swap_cols(data_modeling)
+
+# Save the data
+fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
 
