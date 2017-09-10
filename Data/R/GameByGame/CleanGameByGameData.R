@@ -121,12 +121,22 @@ data_modeling <- data %>%
                   mutate(
                     clay = ifelse(Clay != 0, 1, 0),
                     hard = ifelse(Hard != 0 ,1, 0),
-                    grass = ifelse(Grass != 0, 1, 0)
+                    grass = ifelse(Grass != 0, 1, 0),
+                    p1_win = 1
                   ) %>% 
                   select(
                     -c(Hard, Clay, Grass)
+                  ) %>% 
+                  rename(
+                    p1 = winner_name,
+                    p2 = loser_name
                   )
 
+new_names <- gsub("w_", "p1_", colnames(data_modeling))
+new_names <- gsub("l_", "p2_", new_names)
+
+colnames(data_modeling) <- new_names
+ 
 
                 
 
