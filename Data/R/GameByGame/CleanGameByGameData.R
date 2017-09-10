@@ -86,6 +86,7 @@ data[, l_perc_win := l_wins_365/(l_wins_365 + l_loss_365)]
 data[, w_ave_pts_game := (w_1stWon_365 + w_2ndWon_365 + w_rpt_won_365)/(w_wins_365 + w_loss_365)]
 data[, l_ave_pts_game := (l_1stWon_365 + l_2ndWon_365 + l_rpt_won_365)/(l_wins_365 + l_loss_365)]
 
+fwrite(x = data, "Data/Cleaned/DataGameByGame.csv")
 
 # Create modeling data  ----------------------------------------------
 
