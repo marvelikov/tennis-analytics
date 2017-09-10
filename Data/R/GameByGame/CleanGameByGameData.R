@@ -65,33 +65,49 @@ data$l_loss_365 <- sapply(X = 1:nrow(data), FUN = function(x) {nrow(data[difftim
 # Ratio no.1: Winning percentage on 1st serve
 data[, w_perc_1st_serve_won := w_1stWon_365/w_svpt_365]
 data[, l_perc_1st_serve_won := l_1stWon_365/l_svpt_365]
+# Remove NaN
+data[w_svpt_365 == 0, w_perc_1st_serve_won := 0]
+data[l_svpt_365 == 0, l_perc_1st_serve_won := 0]
 
 # Ratio no.2: Winning percentage on 2nd serve
 data[, w_perc_2nd_serve_won := w_2ndWon_365/w_svpt_365]
 data[, l_perc_2nd_serve_won := l_2ndWon_365/l_svpt_365]
+# Remove NaN
+data[w_svpt_365 == 0, w_perc_2nd_serve_won := 0]
+data[l_svpt_365 == 0, l_perc_2nd_serve_won := 0]
 
 # Ratio no.3: Winning percentage on return serve 
 data[, w_perc_return_won := w_rpt_won_365/w_rpt_365]
 data[, l_perc_return_won := l_rpt_won_365/l_rpt_365]
+# Remove NaN
+data[w_rpt_365 == 0, w_perc_return_won := 0]
+data[l_rpt_365 == 0, l_perc_return_won := 0]
 
 # Ratio no.4: Winning percentage on break point
 data[, w_perc_bp := w_bpSaved_365/w_bpFaced_365]
 data[, l_perc_bp := l_bpSaved_365/l_bpFaced_365]
+# Remove NaN
+data[w_bpFaced_365 == 0, w_perc_bp := 0]
+data[l_bpFaced_365 == 0, l_perc_bp := 0]
 
 # Ratio no.5: Winning percentage of match
 data[, w_perc_win := w_wins_365/(w_wins_365 + w_loss_365)]
 data[, l_perc_win := l_wins_365/(l_wins_365 + l_loss_365)]
+# Remove NaN
+data[(w_wins_365 + w_loss_365) == 0, w_perc_win := 0]
+data[(l_wins_365 + l_loss_365) == 0, l_perc_win := 0]
 
 # Ratio no.6: Average point per game
 data[, w_ave_pts_game := (w_1stWon_365 + w_2ndWon_365 + w_rpt_won_365)/(w_wins_365 + w_loss_365)]
 data[, l_ave_pts_game := (l_1stWon_365 + l_2ndWon_365 + l_rpt_won_365)/(l_wins_365 + l_loss_365)]
+# Remove NaN
+data[(w_wins_365 + w_loss_365) == 0, w_ave_pts_game := 0]
+data[(l_wins_365 + l_loss_365) == 0, l_ave_pts_game := 0]
 
 fwrite(x = data, "Data/Cleaned/DataGameByGame.csv")
+data <- fread("Data/Cleaned/DataGameByGame.csv")
 
 # Create modeling data  ----------------------------------------------
-
-# Spot NaN rows that should be equal to 0
-
 
 data_modeling <- data %>% 
                   select(
@@ -110,6 +126,7 @@ data_modeling <- data %>%
                   select(
                     -c(Hard, Clay, Grass)
                   )
+
 
                 
 
