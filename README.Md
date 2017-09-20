@@ -1,16 +1,20 @@
 # Tennis analytics
 
 ## About the project
-This repo is intented to regroup different analysis that basically link tennis and statistics. There are different modeling examples as well as visualition tools.
+The goal behind this repo is to (learn and) apply deep learning techniques on tennis data. More precisely,
+we focus on the outcome of ATP matches.
+
+(Present status)
+We've just succeeded at fitting a first neural net and got our first match predictions. We now focus on potential new variables and data structure.
 
 ## Modeling
-This folder provides differents modeling examples using different statistical techniques.
+This folder provides the elements concerning model construction.
 
 ## Data
-This folder contains all the raw data as well as the R scripts that eventually import and clean tennis data coming from different sources.
+This folder contains the raw data and the R scripts that eventually import and clean tennis data from different sources.
 
 ## Visualisation
-This folder shows different examples of visualisation (graphs, Shiny, etc.) regarding tennis data.
+In this folder, we wish to provide different tools and analysis for a good visualisation of the data/ATP (graphs, Shiny, etc.)
 
 ## Dev
-For the moment, this folder contains some tests made in order to explore or tests some functions on the data.
+For the moment, this folder contains leftover files.
