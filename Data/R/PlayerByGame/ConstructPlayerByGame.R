@@ -15,7 +15,9 @@
 
 library(tidyverse)
 library(data.table)
+library(stringr)
 library(lubridate)
+library(dplyr)
 
 # Import data -------------------------------------------------------------
 
@@ -65,7 +67,7 @@ data <- rbindlist(l = list(data_winner, data_loser), use.names = TRUE, fill = TR
 # reorder cols for visual purposes.
 new_names <- c(new_names, "win")
 cbind(1:length(new_names),new_names)
-ord <- c(1, 31, 27, 29, 21, 25, 11:20, 26, 22:24, 28, 2:10, 29)
+ord <- c(1, 31, 27, 29, 21, 25, 11:20, 26, 22:24, 28, 2:10)
 
 #length(ord) == length(new_names)
 #setdiff(ord, 1:length(new_names))
@@ -75,5 +77,37 @@ data <- subset(data, select = new_names)
 
 # reorder rows to have opponents beside (row-wise) one another.
 data <- data[order(tourney_id ,tourney_date, match_num)]
+
+
+# Clean the score variable ------------------------------------------------
+
+# Create abondonned indicator
+data[, ind_aband := FALSE]
+data[grep("RET", score), ind_aband := TRUE]
+data[, score := gsub("RET", "", score)]
+
+data[, sapply(1:5, function(x) paste0("score_set_", x)) := tstrsplit(score, " ", fixed = TRUE)]
+# For the moment, I keep the points made by the loser (for both winner and loser) in the tie break col ...
+data[grep(")", score_set_1), tb_set_1 := substr(score_set_1, 5, 5)]
+data[grep(")", score_set_2), tb_set_2 := substr(score_set_2, 5, 5)]
+data[grep(")", score_set_3), tb_set_3 := substr(score_set_3, 5, 5)]
+data[grep(")", score_set_4), tb_set_4 := substr(score_set_4, 5, 5)]
+data[grep(")", score_set_5), tb_set_5 := substr(score_set_5, 5, 5)]
+
+data[win == 1, score_set_1 := substr(score_set_1, 1, 1)]
+data[win == 1, score_set_2 := substr(score_set_2, 1, 1)]
+data[win == 1, score_set_3 := substr(score_set_3, 1, 1)]
+data[win == 1, score_set_4 := substr(score_set_4, 1, 1)]
+data[win == 1, score_set_5 := substr(score_set_5, 1, 1)]
+
+data[win == 0, score_set_1 := substr(score_set_1, 3, 3)]
+data[win == 0, score_set_2 := substr(score_set_2, 3, 3)]
+data[win == 0, score_set_3 := substr(score_set_3, 3, 3)]
+data[win == 0, score_set_4 := substr(score_set_4, 3, 3)]
+data[win == 0, score_set_5 := substr(score_set_5, 3, 3)]
+
+
+
+
 
 fwrite(data, "Data/Cleaned/PlayerOrientedData.csv")
