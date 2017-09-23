@@ -107,7 +107,7 @@ data[win == 0, score_set_4 := substr(score_set_4, 3, 3)]
 data[win == 0, score_set_5 := substr(score_set_5, 3, 3)]
 
 
-
+data[, score := NULL]
 
 
 fwrite(data, "Data/Cleaned/PlayerOrientedData.csv")
