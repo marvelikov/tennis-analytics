@@ -41,15 +41,15 @@ loser_variables <- c("loser_name", loser_variables[-grep(pattern = "name", x = l
 
 # get general variables [tourney_id and match_num will be our id]
 # watch out here for errors if changes are made to raww data...
-general_variables <- names(data)[-c(winner_ind, loser_ind)][c(1,7,(1:11)[-c(1,7)])]
+general_variables <- names(data)[-c(winner_ind, loser_ind)]
 rm("winner_ind", "loser_ind")
 
 new_names <- gsub(loser_variables, pattern = "l_", replacement = "")
 new_names <- gsub(new_names, pattern = "loser_", replacement = "")
 
-winner_variables <- c(winner_variables[1], general_variables[1:2], winner_variables[-1], general_variables[-(1:2)])
-loser_variables <- c(loser_variables[1], general_variables[1:2], loser_variables[-1], general_variables[-(1:2)])
-new_names <- c(new_names[1], general_variables[1:2], new_names[-1], general_variables[-(1:2)])
+winner_variables <- c(winner_variables, general_variables)
+loser_variables <- c(loser_variables, general_variables)
+new_names <- c(new_names, general_variables)
 
 data_winner <- subset(data, select = winner_variables)
 data_loser <- subset(data, select = loser_variables)
@@ -61,5 +61,19 @@ data_winner[, win := rep(1, nrow(data_winner))]
 data_loser[, win := rep(0, nrow(data_winner))]
 
 data <- rbindlist(l = list(data_winner, data_loser), use.names = TRUE, fill = TRUE)
+
+# reorder cols for visual purposes.
+new_names <- c(new_names, "win")
+cbind(1:length(new_names),new_names)
+ord <- c(1, 31, 27, 25, 21, 29, 11:20, 26, 22:24, 28, 2:10, 29)
+
+#length(ord) == length(new_names)
+#setdiff(ord, 1:length(new_names))
+
+new_names <- new_names[ord]
+data <- subset(data, select = new_names)
+
+# reorder rows to have opponents beside (row-wise) one another.
+data <- data[order(tourney_id ,tourney_date, match_num)]
 
 fwrite(data, "Data/Cleaned/PlayerOrientedData.csv")
