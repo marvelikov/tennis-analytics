@@ -40,33 +40,26 @@ winner_variables <- c("winner_name", winner_variables[-grep(pattern = "name", x 
 loser_variables <- c("loser_name", loser_variables[-grep(pattern = "name", x = loser_variables)])
 
 # get general variables [tourney_id and match_num will be our id]
-general_variables <- names(data)[-c(winner_ind, loser_ind)]
-
-
-# ********** the best would be to order them as we wish there ********** #
-# create a winner_variables with both winner_variables and general_variables
-# by mixing them appropriately - do the same for loser.
-
-data_winner <- subset(data, select = c(winner_variables, general_variables))
-data_loser <- subset(data, select = c(loser_variables, general_variables))
-
-# adjust names -- if vectors were created with nice ordering of the variables, watch out
-# with "draw_size" (the w_ can be erased by gsub). *OKAY* Changed it for loser instead..
+# watch out here for errors if changes are made to raww data...
+general_variables <- names(data)[-c(winner_ind, loser_ind)][c(1,7,(1:11)[-c(1,7)])]
+rm("winner_ind", "loser_ind")
 
 new_names <- gsub(loser_variables, pattern = "l_", replacement = "")
 new_names <- gsub(new_names, pattern = "loser_", replacement = "")
 
-names(data_winner) <- c(new_names, general_variables)
-names(data_loser) <- c(new_names, general_variables)
+winner_variables <- c(winner_variables[1], general_variables[1:2], winner_variables[-1], general_variables[-(1:2)])
+loser_variables <- c(loser_variables[1], general_variables[1:2], loser_variables[-1], general_variables[-(1:2)])
+new_names <- c(new_names[1], general_variables[1:2], new_names[-1], general_variables[-(1:2)])
+
+data_winner <- subset(data, select = winner_variables)
+data_loser <- subset(data, select = loser_variables)
+
+names(data_winner) <- new_names
+names(data_loser) <- new_names
+
+data_winner[, win := rep(1, nrow(data_winner))]
+data_loser[, win := rep(0, nrow(data_winner))]
 
 data <- rbindlist(l = list(data_winner, data_loser), use.names = TRUE, fill = TRUE)
 
-
-
-
-# But should we create that from raw or data_G? If we do it from data_G, we need
-# tourney_id or tourney_name to construct the more general match_id
-
-match_id <- unique(paste(raw$tourney_id, raw$tourney_id, sep = ""))
-data_P <- data.table(match_id = rep(unique(match_id), each = 2))
-
+fwrite(data, "Data/Cleaned/PlayerOrientedData.csv")
