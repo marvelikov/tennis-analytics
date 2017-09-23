@@ -65,7 +65,7 @@ data <- rbindlist(l = list(data_winner, data_loser), use.names = TRUE, fill = TR
 # reorder cols for visual purposes.
 new_names <- c(new_names, "win")
 cbind(1:length(new_names),new_names)
-ord <- c(1, 31, 27, 25, 21, 29, 11:20, 26, 22:24, 28, 2:10, 29)
+ord <- c(1, 31, 27, 29, 21, 25, 11:20, 26, 22:24, 28, 2:10, 29)
 
 #length(ord) == length(new_names)
 #setdiff(ord, 1:length(new_names))
