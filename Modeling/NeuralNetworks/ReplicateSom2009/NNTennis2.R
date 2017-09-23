@@ -20,9 +20,13 @@ library(data.table)
 
 data <- fread("Data/Cleaned/DataModeling.csv")
 
+# save names somewhere
+var_names <- colnames(data)
+
 # Remove one year to avoid working with rows full of zeros
 data <- data[tourney_date > "2011-01-01",]
 data <- as.matrix(data[,-c(1,2,3,4)])
+var_names <- var_names[-c(1,2,3,4)]
 colnames(data) <- NULL
 
 # train vs test (Randomly seperated! To be determined more carefully)
