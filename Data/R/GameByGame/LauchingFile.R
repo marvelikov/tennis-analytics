@@ -9,12 +9,11 @@
 
 start_year <- 2010
 end_year <- 2017
-aggregated_time_frame_days <- 365
+aggregated_time_frame_days <- 365 # Unit = days ...
 
 
 # Run needed scripts ------------------------------------------------------
 
-# Not completed yet ...
-source("Import")
-source("Transform")
-source("Summarise")
+source("Data/R/GameByGame/ImportData.R")
+source("Data/R/GameByGame/")
+source("Data/R/GameByGame/SummariseData.R")
