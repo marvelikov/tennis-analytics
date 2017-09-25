@@ -67,11 +67,13 @@ data_transformed_winner[, win := rep(1, nrow(data_transformed_winner))]
 data_transformed_loser[, win := rep(0, nrow(data_transformed_winner))]
 
 data_transformed <- rbindlist(l = list(data_transformed_winner, data_transformed_loser), use.names = TRUE, fill = TRUE)
+data_transformed[, loss := 0]
+data_transformed[win == 0, loss := 1]
 
 # reorder cols for visual purposes.
-new_names <- c(new_names, "win")
+new_names <- c(new_names, "win", "loss")
 cbind(1:length(new_names), new_names)
-ord <- c(1, 32, 28, 30, 22, 26, 12:21, 27, 23:25, 29, 2:11)
+ord <- c(1, 32, 33, 28, 30, 22, 26, 12:21, 27, 23:25, 29, 2:11)
 
 #length(ord) == length(new_names)
 #setdiff(ord, 1:length(new_names))
