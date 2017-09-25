@@ -10,25 +10,25 @@ library(tidyverse)
 library(data.table)
 
 
-# Compute number of days since first match (in the database)
-data_summarised <- data_transformed[, tourney_date_num := as.numeric(tourney_date - min(tourney_date))]
+# Summarise data  ---------------------------------------------------------
 
-# Test moving average just on winner -- needs an update with new data structure**
-subdata <- data_summarised[name == "Milos Raonic", .(svpt_sum = sum(svpt, na.rm = TRUE), svpt_count = .N), by = tourney_date_num]
+# We start by finding each rows that met the conditions setted by the parameters (time frame) and then we'll use 
+# back these indices to summarise our data by different variables
+data_transformed$targeted_rows <- sapply(X = 1:nrow(data_transformed), FUN = function(x) {which(difftime(data_transformed$tourney_date[x], data_transformed$tourney_date, units = "days") < 365 & (difftime(data_transformed$tourney_date[x], data_transformed$tourney_date, units = "days") > 0 | (difftime(data_transformed$tourney_date[x], data_transformed$tourney_date, units = "days") == 0 & data_transformed$match_num[x] > data_transformed$match_num)) & data_transformed$name[x] == data_transformed$name)})
 
+# We define here a function that loop over the different variables that we want to summarise and we crunch them 
+# by the rows determined by the variable "targetet_rows"
 
-data_summarised[tourney_dat_num - lag,, by = (name, tourney_date, match_num)]
+summarise_variable <- function(data, colname, nb_days = 365, fill_missing = NA) {
+  summarised_col_name <- paste0(colname, "_", nb_days)
+  col_number <- which(names(data) == colname)
+  data[, (summarised_col_name) := sapply(X = 1:nrow(data), FUN = function(x) {
+    if (length(unlist(data$targeted_rows[x])) == 0) {
+      NA
+    } else {
+      sum(data[unlist(data$targeted_rows[x]), col_number, with = FALSE], na.rm = TRUE)
+    }
+  })]
+}
 
-subdata_range <- range(subdata$tourney_date_num)
-y <- rep(0, subdata_range[2] - subdata_range[1] + 1)
-y[subdata$tourney_date_num - subdata_range[1] + 1] <- subdata$svpt_sum
-
-# y <- stats::filter(y ,rep(1,365), sides=1)
-# Suppose we wanted average per game instead
-w <- rep(1, subdata_range[2] - subdata_range[1] + 1)
-w[subdata$tourney_date_num - subdata_range[1] + 1] <- subdata$w_svpt_count
-
-fun <- function(n){stats::filter(y, rep(1/n,n), sides=1)}
-fun(365)
-
-
+  
