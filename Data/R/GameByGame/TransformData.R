@@ -21,7 +21,7 @@ library(dplyr)
 
 # Import raw data ---------------------------------------------------------
 
-data_raw <- fread("Data/Raw/data_game_by_game.csv")
+data_raw <- fread("Data/Raw/DataRawGameByGame.csv")
 data_transformed <- data_raw[-grep(pattern = "Davis", x = data_raw$tourney_name),]
 data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 
@@ -116,7 +116,3 @@ data_transformed[win == 0, score_set_5 := substr(score_set_5, 3, 3)]
 data_transformed[, score := NULL]
 rm(data_transformed_loser, data_transformed_winner)
 
-
-# Save transformed data ---------------------------------------------------
-
-#fwrite(data_transformed, "Data/Cleaned/PlayerOrientedData.csv")
