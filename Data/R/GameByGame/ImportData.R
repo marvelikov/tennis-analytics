@@ -25,6 +25,3 @@ import_games <- function(year_from, year_to){
   }
   data_games <- do.call(rbind, data_x)
 }
-
-data <- import_games(year_from = 2010, year_to = 2017)
-fwrite(data, "Data/Raw/data_game_by_game.csv")
