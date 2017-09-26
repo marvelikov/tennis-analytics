@@ -14,6 +14,17 @@ aggregated_time_frame_days <- 365 # Unit = days ...
 
 # Run needed scripts ------------------------------------------------------
 
+# Import data
 source("Data/R/GameByGame/ImportData.R")
-source("Data/R/GameByGame/")
+data_raw <- import_games(year_from = start_year, year_to = end_year)
+fwrite(data_raw, "Data/Raw/DataRawGameByGame.csv")
+
+# Transform data
+source("Data/R/GameByGame/TransformData.R")
+fwrite(data_transformed, "Data/Cleaned/DataTransformed.csv")
+
+# Summarise data
 source("Data/R/GameByGame/SummariseData.R")
+fwrite(data_summarised, "Data/Cleaned/DataSummarised.csv")
+
+# Prepare data for modeling
