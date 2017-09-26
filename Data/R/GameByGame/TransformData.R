@@ -32,6 +32,9 @@ data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 data_transformed$w_rpt_won <- data_transformed$l_svpt - (data_transformed$l_1stWon + data_transformed$l_2ndWon)
 data_transformed$l_rpt_won <- data_transformed$w_svpt - (data_transformed$w_1stWon + data_transformed$w_2ndWon)
 
+data_transformed$w_rpt <- data_transformed$l_svpt
+data_transformed$l_rpt <- data_transformed$w_svpt
+
 # get winner/loser variable names
 winner_ind <- c(grep(pattern = "w_", x = names(data_transformed)), grep(pattern = "winner", x = names(data_transformed)))
 winner_ind <- winner_ind[-1]
@@ -73,7 +76,7 @@ data_transformed[win == 0, loss := 1]
 # reorder cols for visual purposes.
 new_names <- c(new_names, "win", "loss")
 cbind(1:length(new_names), new_names)
-ord <- c(1, 32, 33, 28, 30, 22, 26, 12:21, 27, 23:25, 29, 2:11)
+ord <- c(1, 33, 34, 29, 31, 23, 27, 13:22, 28, 24:26, 30, 2:12)
 
 #length(ord) == length(new_names)
 #setdiff(ord, 1:length(new_names))
