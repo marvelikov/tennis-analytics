@@ -55,12 +55,10 @@ test_y <- data[test_ind,16]
 
 
 # Initialisation
-model <- keras_model_sequential()
-
 # One input layer of 1 input layers of 15 nodes, 1 hidden layer of 30 nodes, with dropout rate 0.4 and 1 output layer[10 neurons]
 #i.e number of digits from 0 to 9
 
-model %>%
+model <-  keras_model_sequential() %>%
   layer_dense(units = 15, input_shape = 15) %>%
   layer_dropout(rate=0.4) %>%
   layer_activation(activation = 'relu') %>%
