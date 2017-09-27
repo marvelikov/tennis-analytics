@@ -20,9 +20,13 @@ library(data.table)
 
 data <- fread("Data/Cleaned/DataModeling.csv")
 
+# save names somewhere
+var_names <- colnames(data)
+
 # Remove one year to avoid working with rows full of zeros
 data <- data[tourney_date > "2011-01-01",]
 data <- as.matrix(data[,-c(1,2,3,4)])
+var_names <- var_names[-c(1,2,3,4)]
 colnames(data) <- NULL
 
 # train vs test (Randomly seperated! To be determined more carefully)
@@ -51,12 +55,10 @@ test_y <- data[test_ind,16]
 
 
 # Initialisation
-model <- keras_model_sequential()
-
 # One input layer of 1 input layers of 15 nodes, 1 hidden layer of 30 nodes, with dropout rate 0.4 and 1 output layer[10 neurons]
 #i.e number of digits from 0 to 9
 
-model %>%
+model <-  keras_model_sequential() %>%
   layer_dense(units = 15, input_shape = 15) %>%
   layer_dropout(rate=0.4) %>%
   layer_activation(activation = 'relu') %>%
