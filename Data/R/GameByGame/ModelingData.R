@@ -16,9 +16,37 @@ data_summarised <- fread("Data/Cleaned/DataSummarised.csv")
 
 # Transform data for modeling purposes ------------------------------------
 
-data_modeling <- data %>% 
+cols_modeling <- c("tourney_date", "match_num", "name", "perc_1st_serve_won", "perc_2nd_serve_won", "perc_return_won", "perc_bp", "perc_win", "ave_pts_game", "surface", "win")
+data_pre_modeling <- data_summarised[, !cols_modeling, with = FALSE]
+
+data_summarised_winner <- data_summarised[win == 1,]
+new_names_win <- sapply(1:names(data_summarised_winner), function(x) {
+  if (x != c("tourney_date", "match_num", "surface")) {
+    paste0("w_", x)
+  } else {
+    x
+  }
+})
+names(data_summarised_winner) <- new_names_win
+
+data_summarised_looser <- data_summarised[win == 0,]
+new_names_loss <- sapply(1:names(data_summarised_winner), function(x) {
+  if (x != c("tourney_date", "surface")) {
+    paste0("l_", x)
+  } else {
+    x
+  }
+})
+names(data_summarised_looser) <- new_names_loss
+
+# Rejoin both tables together
+setkey(data_summarised_winner, tourney_date, match_num, surface)
+setkey(data_summarised_looser, tourney_date, match_num, surface)
+data_summarised_winner[data_summarised_looser]
+
+data_modeling <- data_summarised %>% 
                     select(
-                      -c(score, w_svpt, w_1stIn, w_1stWon, w_2ndWon, w_bpSaved, w_bpFaced, l_svpt, l_1stIn, l_1stWon, l_2ndWon, l_bpSaved, l_bpFaced, w_rpt_won, l_rpt_won, w_svpt_365, l_svpt_365, w_1stIn_365, l_1stIn_365, w_1stWon_365, l_1stWon_365, w_2ndWon_365, l_2ndWon_365, w_bpSaved_365, l_bpSaved_365, w_bpFaced_365, l_bpFaced_365, w_rpt_365, l_rpt_365, w_rpt_won_365, l_rpt_won_365, w_wins_365, w_loss_365, l_wins_365, l_loss_365) 
+                      -c(w_win, l_win)
                     ) %>% 
                     spread(
                       surface,
