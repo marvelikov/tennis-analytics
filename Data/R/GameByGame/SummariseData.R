@@ -8,12 +8,13 @@
 
 library(tidyverse)
 library(data.table)
+library(lubridate)
 
 
 # Load transformed data ---------------------------------------------------
 
 data_transformed <- fread("Data/Cleaned/DataTransformed.csv")
-
+data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 
 # Summarise data  ---------------------------------------------------------
 
