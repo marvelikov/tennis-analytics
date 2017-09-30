@@ -33,4 +33,4 @@ fwrite(data_pre_modeling, "Data/Cleaned/DataPreModeling.csv")
 
 # Structure data for modeling
 source("Data/R/GameByGame/ModelingData.R")
-fwrite(data_pre_modeling, "Data/Cleaned/DataPreModeling.csv")
+fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
