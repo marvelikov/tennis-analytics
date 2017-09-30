@@ -27,4 +27,10 @@ fwrite(data_transformed, "Data/Cleaned/DataTransformed.csv")
 source("Data/R/GameByGame/SummariseData.R")
 fwrite(data_summarised, "Data/Cleaned/DataSummarised.csv")
 
-# Prepare data for modeling
+# Create variables
+source("Data/R/GameByGame/CreateVariablesData.R")
+fwrite(data_pre_modeling, "Data/Cleaned/DataPreModeling.csv")
+
+# Structure data for modeling
+source("Data/R/GameByGame/ModelingData.R")
+fwrite(data_pre_modeling, "Data/Cleaned/DataPreModeling.csv")
