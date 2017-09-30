@@ -11,13 +11,13 @@ library(tidyverse)
 
 # Import summarised data --------------------------------------------------
 
-data_summarised <- fread("Data/Cleaned/DataSummarised.csv")
+data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
 
 
 # Transform data for modeling purposes ------------------------------------
 
 cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won", "perc_2nd_serve_won", "perc_return_won", "perc_bp", "perc_win", "ave_pts_game", "surface", "win")
-data_pre_modeling <- data_summarised[, cols_modeling, with = FALSE]
+data_pre_modeling <- data_pre_modeling[, cols_modeling, with = FALSE]
 
 data_pre_modeling_winner <- data_pre_modeling[win == 1,]
 new_names_win <- sapply(1:length(data_pre_modeling_winner), function(x) {
