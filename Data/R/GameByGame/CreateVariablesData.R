@@ -32,11 +32,15 @@ data_summarised[, perc_win := win_365/(win_365 + loss_365)]
 # Ratio no.6: Average point per game
 data_summarised[, ave_pts_game := (`1stWon_365` + `2ndWon_365` + rpt_won_365)/(win_365 + loss_365)]
 
+# Ratio no.7: 1st serve In percentage
+data_summarised[, perc_1st_in := `1stIn_365`/svpt_365]
+
 # Remove NaN
 data_summarised[is.na(svpt_365), perc_1st_serve_won := 0]
 data_summarised[is.na(rpt_365), perc_2nd_serve_won := 0]
 data_summarised[is.na(bpFaced_365) | bpFaced_365 == 0, perc_bp := 0]
 data_summarised[is.na(win_365 + loss_365), perc_win := 0]
 data_summarised[is.na(win_365 + loss_365), ave_pts_game := 0]
+data_summarised[is.na(svpt_365), perc_1st_in := 0]
 
 data_pre_modeling <- data_summarised
