@@ -47,7 +47,7 @@ rm(data_pre_modeling_winner, data_pre_modeling_looser)
 
 data_modeling <- data_pre_modeling %>% 
                     select(
-                      -c(w_win, l_win, tourney_name)
+                      -c(w_win, l_win)
                     ) %>% 
                     spread(
                       surface,
@@ -76,7 +76,7 @@ colnames(data_modeling) <- new_names
 
 # Swap the columns
 source("Data/R/GameByGame/SwapColumns.R")
-data_modeling <- swap_cols(data_modeling)
+data_modeling <- swap_cols(data_modeling) %>% select(-tourney_name)
 
 # Save the data
 fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
