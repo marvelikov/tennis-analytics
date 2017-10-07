@@ -8,7 +8,7 @@ swap_cols <- function(data, seed = 666) {
   
   # Define rows and cols to swap
   set.seed(seed)
-  data <- data[order(tourney_date, match_num)]
+  data <- data[order(tourney_date, match_num, tourney_name)]
   row_swap <- sample(1:nrow(data), 0.5 * nrow(data))
   names <- colnames(data)
   modified_name <- gsub(paste("p1", "p2", sep = "|"), "", names[-ncol(data)])

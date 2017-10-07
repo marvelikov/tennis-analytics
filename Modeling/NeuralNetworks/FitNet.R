@@ -14,6 +14,7 @@ data <- fread("Data/Cleaned/DataModeling.csv")
 
 # Remove one year to avoid working with rows full of zeros
 data <- data[tourney_date > "2011-01-01",]
+data <- na.omit(data)
 
 # Remove player names date and match num
 data <- data[,-c(1,2,3,4)]

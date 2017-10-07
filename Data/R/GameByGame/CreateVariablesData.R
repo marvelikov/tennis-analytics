@@ -3,6 +3,7 @@
 # Author: Stephane Caron
 # Subject: This script is aimed to create variables that will be used in modeling
 
+library(data.table)
 
 # Import summarised data --------------------------------------------------
 
@@ -37,7 +38,8 @@ data_summarised[, perc_1st_in := `1stIn_365`/svpt_365]
 
 # Remove NaN
 data_summarised[is.na(svpt_365), perc_1st_serve_won := 0]
-data_summarised[is.na(rpt_365), perc_2nd_serve_won := 0]
+data_summarised[is.na(svpt_365), perc_2nd_serve_won := 0]
+data_summarised[is.na(rpt_365), perc_return_won := 0]
 data_summarised[is.na(bpFaced_365) | bpFaced_365 == 0, perc_bp := 0]
 data_summarised[is.na(win_365 + loss_365), perc_win := 0]
 data_summarised[is.na(win_365 + loss_365), ave_pts_game := 0]
