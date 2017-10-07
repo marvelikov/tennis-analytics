@@ -10,13 +10,14 @@ library(data.table)
 # Import/prepare data -----------------------------------------------------
 #####################
 
-#data <- fread("Data/Cleaned/DataModeling.csv")
-data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
+data <- fread("Data/Cleaned/DataModeling.csv")
+# data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
 # Remove one year to avoid working with rows full of zeros
 data <- data[tourney_date > "2011-01-01",]
 
 # Remove player names date and match num
 data <- data[,-c(1,2,3,4)]
+data <- na.omit(data)
 
 # save names somewhere
 var_names <- colnames(data)
