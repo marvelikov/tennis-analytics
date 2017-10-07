@@ -24,7 +24,7 @@ data[swap, 1:12] <- data[swap, c(7:12, 1:6)]
 data[swap, ncol(data)] <- 1-data[swap, ncol(data)]
 
 # data2[is.na(data2)] <- 0
-# data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
+data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
 # 
 # data2 <- data2[order(tourney_date, match_num)]
 # colSums(1 - (data == data2))
@@ -65,8 +65,8 @@ test_y <- subset(data, subset = as.logical(test_ind), select = "p1_win")
 # watch out here. Might not always work when we add variables...
 numeric_variables <- which(var_types == "numeric" & var_types != "integer")
 
-# train_x[,numeric_variables] <- scale(train_x[,numeric_variables], center = TRUE)
-# test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
+train_x[,numeric_variables] <- scale(train_x[,numeric_variables], center = TRUE)
+test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
 
 
 
@@ -80,6 +80,7 @@ model <-  keras_model_sequential() %>%
   layer_activation(activation = 'relu') %>%
   layer_dense(units = 1) %>%
   layer_activation(activation = 'sigmoid')
+
 
 
 # Compile
