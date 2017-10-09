@@ -76,7 +76,7 @@ data_transformed[win == 0, loss := 1]
 # reorder cols for visual purposes.
 new_names <- c(new_names, "win", "loss")
 cbind(1:length(new_names), new_names)
-ord <- c(1, 33, 34, 29, 31, 23, 27, 13:22, 28, 24:26, 30, 2:12)
+ord <- c(1, 33, 34, 29, 31, 23, 27, 13:22, 28, 24:26, 30, 32, 2:12)
 
 #length(ord) == length(new_names)
 #setdiff(ord, 1:length(new_names))
