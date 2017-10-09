@@ -11,23 +11,9 @@ library(tidyverse)
 # Import/prepare data -----------------------------------------------------
 #####################
 
-data <- fread("Data/Cleaned/DataModeling.csv") %>% 
-  select(
-    -p1_perc_1st_in,
-    -p2_perc_1st_in
-  )
+data <- fread("Data/Cleaned/DataModeling.csv")
 
-data <- data[,-c(1,2,3,10)]
-data <- as.matrix(data)
-swap <- sample(nrow(data), nrow(data)/2)
-data[swap, 1:12] <- data[swap, c(7:12, 1:6)]
-data[swap, ncol(data)] <- 1-data[swap, ncol(data)]
-
-# data2[is.na(data2)] <- 0
-data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
-# 
-# data2 <- data2[order(tourney_date, match_num)]
-# colSums(1 - (data == data2))
+# data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
 
 # Remove one year to avoid working with rows full of zeros
 data <- data[tourney_date > "2011-01-01",]
