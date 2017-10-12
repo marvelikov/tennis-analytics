@@ -1,7 +1,7 @@
 # Title: CreateVariablesData
 # Date: 30 septembre 2017
 # Author: Stephane Caron
-# Subject: This script is aimed to create variables that will be used in modeling
+# Subject: In this script we create the variables that will be used in modeling
 
 library(data.table)
 

@@ -3,7 +3,7 @@
 # Author: Stephane Caron
 # Subject: Lauching file to update game by game data
 
-# I wanna build a lauching file that will be used to update/clean/structure game by game tennis data ...
+# I wanna build a launching file that will be used to update/clean/structure game by game tennis data ...
 
 # Set wanted variables ----------------------------------------------------
 
