@@ -20,17 +20,16 @@ data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 
 # Here we define the columns we need to create our variables with the timeframe (to summarised) associated to each columns 
 variables_to_summarise <- list(
-                            serve_point = list(var = "svpt", time_frame = 365), 
-                            first_serve_in = list(var = "1stIn", time_frame = 365),
-                            first_serve_won = list(var = "1stWon", time_frame = 365),
-                            second_serve_won = list(var = "2ndWon", time_frame = 365), 
-                            bp_faced = list(var = "bpFaced", time_frame = 365), 
+                            serve_point = list(var = "svpt", time_frame = 365, split = NULL), 
+                            first_serve_in = list(var = "1stIn", time_frame = 365, split = NULL),
+                            first_serve_won = list(var = "1stWon", time_frame = 365, split = NULL),
+                            second_serve_won = list(var = "2ndWon", time_frame = 365, split = NULL), 
+                            bp_faced = list(var = "bpFaced", time_frame = 365, split = NULL), 
                             bp_saved = list(var = "bpSaved", time_frame = 365), 
-                            return_point_won = list(var = "rpt_won", time_frame = 365), 
-                            return_point = list(var = "rpt", time_frame = 365), 
-                            win = list(var = "win", time_frame = 365), 
-                            loss = list(var = "loss", time_frame = 365), 
-                            min_played = list(var = "minutes", time_frame = 3)
+                            return_point_won = list(var = "rpt_won", time_frame = 365, split = NULL), 
+                            return_point = list(var = "rpt", time_frame = 365, split = NULL), 
+                            win = list(var = "win", time_frame = 365, split = "surface"), 
+                            loss = list(var = "loss", time_frame = 365, split = "surface")
                             )
 
 unique_tf <- unique(unlist(lapply(variables_to_summarise, function(x) x[["time_frame"]])))
@@ -62,7 +61,7 @@ lapply(X = variables_to_summarise, function(x) {
     print(paste(unlist(split_grid[row,]), collapse = "_"))
     data_transformed[, (paste(unlist(split_grid[row,]), collapse = "_")) := sapply(1:nrow(data_transformed), FUN = function(i) {
       if (length(unlist(data_transformed[i, paste0("targeted_rows_", x[["time_frame"]]), with = FALSE])) == 0) {
-        NA
+        0 # For the moment I fill missing values with 0 to make it easy to build variables after. In fact, it would probably be better to fill with NAs here to have a indication of real missing values
       } else {
         text_condition <- paste0(sapply(x[["split"]], function(col) {
           paste0(col, "=='", split_grid[row, col, with = FALSE], "'")
