@@ -13,8 +13,8 @@ library(lubridate)
 
 # Load transformed data ---------------------------------------------------
 
-data_transformed <- fread("Data/Cleaned/DataTransformed.csv")
-data_transformed <- fread("Data/R/GameByGame/data_transformed2.csv")
+data_transformed <- fread("Data/Cleaned/DataTransformed.csv", stringsAsFactors = FALSE)
+# data_transformed <- fread("Data/R/GameByGame/data_transformed2.csv")
 data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 
 # Summarise data  ---------------------------------------------------------
@@ -47,42 +47,43 @@ sapply(X = unique_tf, FUN = function(time) {
 # Summarise data given the time frame of the variable ---------------------
 
 lapply(X = variables_to_summarise, function(x) {
-  print(x[["var"]])
-  col_to_summarised <- which(names(data_transformed) == x[["var"]])
   
+  # We begin by looking if it's a variable to split
   if(is.null(x[["split"]])) {
     split_grid <- cbind(data.table(var = x[["var"]]), data.table(time_frame = x[["time_frame"]]))
   } else {
     split_grid <- cbind(data.table(var = x[["var"]]), expand.grid(sapply(x[["split"]], function(split_var) {
       unique(data_transformed[, split_var, with = FALSE])
-    }, USE.NAMES = FALSE)), data.table(time_frame = x[["time_frame"]])) 
+    }, USE.NAMES = FALSE), stringsAsFactors = FALSE), data.table(time_frame = x[["time_frame"]])) 
   }
   
+  # We calculate the new summarised variable of the given time frame
   sapply(1:nrow(split_grid), function(row) {
-    data_transformed[, (paste(split_grid[row,], collapse = "_")) := sapply(1:nrow(data_transformed), FUN = function(i) {
+    print(paste(unlist(split_grid[row,]), collapse = "_"))
+    data_transformed[, (paste(unlist(split_grid[row,]), collapse = "_")) := sapply(1:nrow(data_transformed), FUN = function(i) {
       if (length(unlist(data_transformed[i, paste0("targeted_rows_", x[["time_frame"]]), with = FALSE])) == 0) {
         NA
       } else {
         text_condition <- paste0(sapply(x[["split"]], function(col) {
-          paste0("[", col, "=='", split_grid[row, col], "']")
+          paste0(col, "=='", split_grid[row, col, with = FALSE], "'")
         }), collapse = "")
-        text_eval <- paste0("sum(data_transformed[unlist(data_transformed[i, paste0('targeted_rows_', x[['time_frame']]), with = FALSE]), x[['var']], with = FALSE]", text_condition, ", na.rm = TRUE)")
-        print(row)
+        text_eval <- paste0("sum(unlist(data_transformed[unlist(data_transformed[i, paste0('targeted_rows_', x[['time_frame']]), with = FALSE]), ][", text_condition, ", x[['var']], with = FALSE]), na.rm = TRUE)")
         eval(parse(text = text_eval))
       }
-    }
-   )]
+    })]
   })
 })
 
 # Copy the transformed data
 data_summarised <- copy(data_transformed)
 
-test <- variables_to_summarise[[9]]
+x <- variables_to_summarise[[1]]
 
 split_grid <- cbind(data.table(var = test[["var"]]), expand.grid(sapply(test[["split"]], function(split_var) {
   unique(data_transformed[, split_var, with = FALSE])
 }, USE.NAMES = FALSE)), data.table(time_frame = test[["time_frame"]])) 
+
+sum(data_transformed[unlist(data_transformed[i, paste0('targeted_rows_', x[['time_frame']]), with = FALSE]), x[['var']], with = FALSE][surface=='Clay'], na.rm = TRUE)
 
 
 
