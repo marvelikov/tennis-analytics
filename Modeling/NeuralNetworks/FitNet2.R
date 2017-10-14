@@ -60,8 +60,9 @@ test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
 
 model <-  keras_model_sequential() %>%
   layer_dense(units = nb_variables, input_shape = nb_variables) %>%
-  layer_dropout(rate=0.4) %>%
   layer_activation(activation = 'relu') %>%
+  layer_dense(units = nb_variables) %>%
+  layer_dropout(rate=0.1) %>%
   layer_dense(units = 1) %>%
   layer_activation(activation = 'sigmoid')
 
@@ -77,7 +78,7 @@ model %>% compile(
 # Fit
 
 #batch_size <- 128 # Somewhat arbitrary 
-model %>% fit(x = train_x, y = train_y, epochs = 100)
+model %>% fit(x = train_x, y = train_y, epochs = 40)
 
 #Evaluating model on the cross validation dataset
 loss_and_metrics <- model %>% evaluate(test_x, test_y)
