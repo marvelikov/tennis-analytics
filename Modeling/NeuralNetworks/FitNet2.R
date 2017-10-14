@@ -60,9 +60,13 @@ test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
 
 model <-  keras_model_sequential() %>%
   layer_dense(units = nb_variables, input_shape = nb_variables) %>%
-  layer_activation(activation = 'relu') %>%
+  layer_activation(activation = 'sigmoid') %>%
   layer_dense(units = nb_variables) %>%
+  layer_activation(activation = 'sigmoid') %>%
   layer_dropout(rate=0.1) %>%
+  layer_dense(units = nb_variables) %>%
+  layer_activation(activation = 'sigmoid') %>%
+  layer_dropout(rate=0.2) %>%
   layer_dense(units = 1) %>%
   layer_activation(activation = 'sigmoid')
 
