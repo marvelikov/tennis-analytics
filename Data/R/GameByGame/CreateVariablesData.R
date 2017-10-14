@@ -27,8 +27,10 @@ data_summarised[, perc_return_won := rpt_won_365/rpt_365]
 # Ratio no.4: Winning percentage on break point
 data_summarised[, perc_bp := bpSaved_365/bpFaced_365]
 
-# Ratio no.5: Winning percentage of match
-data_summarised[, perc_win := win_365/(win_365 + loss_365)]
+# Ratio no.5: Winning percentage of match per surface
+data_summarised[, perc_win_clay := win_Clay_365/(win_Clay_365 + loss_Clay_365)]
+data_summarised[, perc_win_grass := win_Grass_365/(win_Grass_365 + loss_Grass_365)]
+data_summarised[, perc_win_hard := win_Hard_365/(win_Hard_365 + loss_Hard_365)]
 
 # Ratio no.6: Average point per game
 data_summarised[, ave_pts_game := (`1stWon_365` + `2ndWon_365` + rpt_won_365)/(win_365 + loss_365)]
