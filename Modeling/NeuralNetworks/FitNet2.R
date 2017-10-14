@@ -79,7 +79,7 @@ model %>% compile(
 # Fit
 
 #batch_size <- 128 # Somewhat arbitrary 
-model %>% fit(x = train_x, y = train_y, epochs = 50)
+model %>% fit(x = train_x, y = train_y, epochs = 100)
 
 #Evaluating model on the cross validation dataset
 loss_and_metrics <- model %>% evaluate(test_x, test_y)

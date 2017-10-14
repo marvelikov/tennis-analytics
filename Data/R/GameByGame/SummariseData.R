@@ -77,3 +77,4 @@ lapply(X = variables_to_summarise, function(x) {
 
 # Copy the transformed data
 data_summarised <- copy(data_transformed)
+
