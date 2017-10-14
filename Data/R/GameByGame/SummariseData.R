@@ -27,9 +27,11 @@ variables_to_summarise <- list(
                             bp_faced = list(var = "bpFaced", time_frame = 365, split = NULL), 
                             bp_saved = list(var = "bpSaved", time_frame = 365), 
                             return_point_won = list(var = "rpt_won", time_frame = 365, split = NULL), 
-                            return_point = list(var = "rpt", time_frame = 365, split = NULL), 
-                            win = list(var = "win", time_frame = 365, split = "surface"), 
-                            loss = list(var = "loss", time_frame = 365, split = "surface")
+                            return_point = list(var = "rpt", time_frame = 365, split = NULL),
+                            win = list(var = "win", time_frame = 365, split = NULL),
+                            loss = list(var = "loss", time_frame = 365, split = NULL),
+                            win = list(var = "win", time_frame = (3 * 365), split = "surface"), 
+                            loss = list(var = "loss", time_frame = (3 * 365), split = "surface")
                             )
 
 unique_tf <- unique(unlist(lapply(variables_to_summarise, function(x) x[["time_frame"]])))
@@ -75,5 +77,3 @@ lapply(X = variables_to_summarise, function(x) {
 
 # Copy the transformed data
 data_summarised <- copy(data_transformed)
-
-  
