@@ -35,9 +35,7 @@ nb_variables <- length(var_names)
 set.seed(667) # watch out not to put 666 in there!
 
 test_pct <- .05
-test_ind <- rep(0,nrow(data))
-test_ind[sample(nrow(data), nrow(data) * test_pct)] <- 1
-
+test_ind <- sample(x = c(0,1), size = nrow(data), prob = c(1 - test_pct, test_pct), replace = TRUE)
 
 # Need the variable p1_wins to be defined in the data (in the appropriate script)
 train_x <- subset(data, subset = as.logical(1-test_ind), select = var_names)
