@@ -16,7 +16,7 @@ data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
 
 # Transform data for modeling purposes ------------------------------------
 
-cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won", "perc_2nd_serve_won", "perc_return_won", "perc_bp", "perc_win_clay", "perc_win_grass", "perc_win_hard", "ave_pts_game", "perc_1st_in", "surface", "win")
+cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won", "perc_2nd_serve_won", "perc_return_won", "perc_bp", "perc_win", "game_played", "perc_win_clay", "game_played_clay", "game_played_grass", "game_played_hard", "perc_win_grass", "perc_win_hard", "ave_pts_game", "perc_1st_in", "surface", "win")
 data_pre_modeling <- data_pre_modeling[, cols_modeling, with = FALSE]
 
 data_pre_modeling_winner <- data_pre_modeling[win == 1,]
