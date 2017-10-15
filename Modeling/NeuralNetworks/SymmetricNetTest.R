@@ -27,9 +27,18 @@ var_types <- sapply(data, class)[-ncol(data)]
 data <- as.matrix(data)
 var_names <- colnames(data[,-ncol(data)])
 
+nc <- ncol(data)
+
+new.data <- sapply(1:((nc - 4)/2), function(i){
+  nd <- data[,2 * i - 1] - data[,2 * i]
+})
+new.data <- cbind(new.data, data[,nc - 3:0])
+
+data <- new.data
 
 # record number of variables
-nb_variables <- length(var_names)
+var_types <- sapply(data, class)
+nb_variables <- ncol(data) - 1
 
 # train vs test (Randomly seperated! To be determined more carefully)
 set.seed(667) # watch out not to put 666 in there!
@@ -38,19 +47,19 @@ test_pct <- .05
 test_ind <- sample(x = c(0,1), size = nrow(data), prob = c(1 - test_pct, test_pct), replace = TRUE)
 
 # Need the variable p1_wins to be defined in the data (in the appropriate script)
-train_x <- subset(data, subset = as.logical(1-test_ind), select = var_names)
+train_x <- subset(data, subset = as.logical(1-test_ind), select = 1:nb_variables)
 train_y <- subset(data, subset = as.logical(1-test_ind), select = "p1_win")
-test_x <- subset(data, subset = as.logical(test_ind), select = var_names)
+test_x <- subset(data, subset = as.logical(test_ind), select = 1:nb_variables)
 test_y <- subset(data, subset = as.logical(test_ind), select = "p1_win")
 #rm(data)
 
 # Normalize the columns we want to normalize...
 
 # watch out here. Might not always work when we add variables...
-numeric_variables <- which(var_types == "numeric" & var_types != "integer")
 
-train_x[,numeric_variables] <- scale(train_x[,numeric_variables], center = TRUE)
-test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
+
+train_x[,1:(nb_variables-3)] <- scale(train_x[,1:(nb_variables-3)], center = TRUE)
+test_x[,1:(nb_variables-3)] <- scale(test_x[,1:(nb_variables-3)], center = TRUE)
 
 
 
@@ -59,9 +68,9 @@ test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
 #i.e number of digits from 0 to 9
 
 model <-  keras_model_sequential() %>%
-  #layer_dense(units = floor(nb_variables/2), input_shape = nb_variables) %>%
   layer_dense(units = floor(nb_variables), input_shape = nb_variables) %>%
-  layer_activation(activation = 'relu') %>%
+  layer_dropout(rate=0.1) %>%
+  layer_dense(units = floor((nb_variables - 3)/2)) %>%
   layer_dropout(rate=0.1) %>%
   layer_dense(units = 1) %>%
   layer_activation(activation = 'sigmoid')
