@@ -9,10 +9,20 @@
 
 start_year <- 2000
 end_year <- 2016
-aggregated_time_frame_days <- 365 # Unit = days ...
+split_data_into <- 4
 
 
 # Run needed scripts ------------------------------------------------------
+
+split_data_git <- function(data, split_into, filename) {
+  start_row <- 1
+  step <- nrow(data)/split_into
+  for (i in 1:split_into) {
+    data_temp <- data[start_row:(step * i),]
+    start_row <- (step * i) + 1
+    fwrite(data_temp, paste0(filename, "_", i, ".csv"))
+  }
+}
 
 start_time <- Sys.time()
 # Import data
@@ -28,17 +38,17 @@ transform_time <- Sys.time()
 
 # Summarise data
 source("Data/R/GameByGame/SummariseData.R")
-fwrite(data_summarised, "Data/Cleaned/DataSummarised.csv")
+split_data_git(data = data_summarised, split_into = split_data_into, filename = "Data/Cleaned/DataSummarised")
 summarise_time <- Sys.time()
 
 # Create variables
 source("Data/R/GameByGame/CreateVariablesData.R")
-fwrite(data_pre_modeling, "Data/Cleaned/DataPreModeling.csv")
+split_data_git(data = data_pre_modeling, split_into = split_data_into, filename = "Data/Cleaned/DataPreModeling")
 variables_time <- Sys.time()
 
 # Structure data for modeling
 source("Data/R/GameByGame/ModelingData.R")
-fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
+split_data_git(data = data_modeling, split_into = split_data_into, filename = "Data/Cleaned/DataModeling")
 modeling_time <- Sys.time()
 
 # Summary of execution time
