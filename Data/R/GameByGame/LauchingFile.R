@@ -56,3 +56,4 @@ modeling_time <- Sys.time()
 int <- list(start_time, import_time, transform_time, summarise_time, variables_time, modeling_time)
 
 lapply(1:(length(int)-1), function(i) difftime(int[[i+1]], int[[i]], units = "min"))
+
