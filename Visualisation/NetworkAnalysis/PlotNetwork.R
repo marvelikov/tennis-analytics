@@ -1,6 +1,6 @@
 # Creates model... a little bit of patience is necessary.
 # It also loads keras...
-source("Modeling/NeuralNetworks/ReplicateSom2009/NNTennis2.R")
+#source("Modeling/NeuralNetworks/ReplicateSom2009/NNTennis2.R")
 
 
 # Load packages -----------------------------------------------------------
@@ -67,7 +67,7 @@ plot <- plot +
 for(i in 1:nrow(set12)){
   dat <- data.table(x = c(set12$x1[i],set12$x2[i]), y = c(set12$y1[i],set12$y2[i]))
   ww <- w[[1]][dat$x[1] + m1, dat$x[2] + m2]
-  if(abs(ww) > .5){
+  if(abs(ww) > .1){
     col <- colfunc(200)[median(c(1, 100 + ww * 100 ,200)) ]
     plot <- plot + geom_line(data = dat, aes(x,y), col = col)
   }
@@ -78,7 +78,7 @@ for(i in 1:nrow(set12)){
 for(i in 1:nrow(set23)){
   dat <- data.table(x = c(set23$x2[i],set23$x3[i]), y = c(set23$y2[i],set23$y3[i]))
   ww <- w[[3]][dat$x[1] + m2, dat$x[2] + m3]
-  if(abs(ww) > .25){
+  if(abs(ww) > .1){
     col <- colfunc(200)[median(c(1, 100 + ww * 100 ,200)) ]
     plot <- plot + geom_line(data = dat, aes(x,y), col = col)
   }
@@ -87,7 +87,7 @@ for(i in 1:nrow(set23)){
 plot
 
 
-var_names[- length(var_names)]
+var_names
 
 par(mar = c(0,0,0,0))
 image(t(w[[1]][nrow(w[[1]]):1,]), axes=FALSE, col=colfunc(100))
