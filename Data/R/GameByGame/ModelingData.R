@@ -11,8 +11,12 @@ library(tidyverse)
 
 # Import summarised data --------------------------------------------------
 
+<<<<<<< HEAD
 data_pre_modeling <- import_splitted_data(filename = "Data/Cleaned/DataPreModeling", split_number = split_data_into)
 # data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
+=======
+data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
+>>>>>>> 051d0bd0e46f7872d69092a116c4e9a6487968a3
 
 
 # Transform data for modeling purposes ------------------------------------

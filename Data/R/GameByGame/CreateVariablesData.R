@@ -7,8 +7,12 @@ library(data.table)
 
 # Import summarised data --------------------------------------------------
 
+<<<<<<< HEAD
 data_summarised <- import_splitted_data(filename = "Data/Cleaned/DataSummarised", split_number = split_data_into)
 # data_summarised <- fread("Data/Cleaned/DataSummarised.csv", stringsAsFactors = FALSE)
+=======
+data_summarised <- fread("Data/Cleaned/DataSummarised.csv", stringsAsFactors = FALSE)
+>>>>>>> 051d0bd0e46f7872d69092a116c4e9a6487968a3
 
 
 # Creates variables -------------------------------------------------------
