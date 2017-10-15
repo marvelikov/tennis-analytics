@@ -24,6 +24,6 @@ import_games <- function(year_from, year_to){
     # data_x[[i]] <- read.csv(textConnection(x))
     i <- i + 1
   }
-  # data_games <- do.call(rbind, data_x)
-  data_games <- rbindlist(data_x, use.names = TRUE, fil = TRUE)
+  data_games <- do.call(rbind, data_x)
+  # data_games <- rbindlist(data_x, use.names = TRUE, fill = TRUE)
 }

@@ -10,6 +10,7 @@
 start_year <- 2000
 end_year <- 2016
 split_data_into <- 4
+source("Data/R/ImportSplittedData.R")
 
 
 # Run needed scripts ------------------------------------------------------
@@ -48,7 +49,7 @@ variables_time <- Sys.time()
 
 # Structure data for modeling
 source("Data/R/GameByGame/ModelingData.R")
-split_data_git(data = data_modeling, split_into = split_data_into, filename = "Data/Cleaned/DataModeling")
+fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
 modeling_time <- Sys.time()
 
 # Summary of execution time
