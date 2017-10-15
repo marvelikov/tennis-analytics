@@ -11,12 +11,14 @@ library(tidyverse)
 
 # Import summarised data --------------------------------------------------
 
-data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
+data_pre_modeling <- import_splitted_data(filename = "Data/Cleaned/DataPreModeling", split_number = split_data_into)
+# data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
+
 
 
 # Transform data for modeling purposes ------------------------------------
 
-cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won", "perc_2nd_serve_won", "perc_return_won", "perc_bp", "perc_win", "ave_pts_game", "perc_1st_in", "surface", "win")
+cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won", "perc_2nd_serve_won", "perc_return_won", "perc_bp", "perc_win", "game_played", "perc_win_clay", "game_played_clay", "game_played_grass", "game_played_hard", "perc_win_grass", "perc_win_hard", "ave_pts_game", "perc_1st_in", "surface", "win")
 data_pre_modeling <- data_pre_modeling[, cols_modeling, with = FALSE]
 
 data_pre_modeling_winner <- data_pre_modeling[win == 1,]
@@ -47,7 +49,7 @@ rm(data_pre_modeling_winner, data_pre_modeling_looser)
 
 data_modeling <- data_pre_modeling %>% 
                     select(
-                      -c(w_win, l_win, tourney_name)
+                      -c(w_win, l_win)
                     ) %>% 
                     spread(
                       surface,
@@ -76,7 +78,7 @@ colnames(data_modeling) <- new_names
 
 # Swap the columns
 source("Data/R/GameByGame/SwapColumns.R")
-data_modeling <- swap_cols(data_modeling)
+data_modeling <- swap_cols(data_modeling) %>% select(-tourney_name)
 
 # Save the data
 fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")

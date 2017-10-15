@@ -20,8 +20,10 @@ import_games <- function(year_from, year_to){
   data_x <- list(NA)
   for (year in (year_from:year_to)){
     x <- getURL(paste0("https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_", year, ".csv"))
-    data_x[[i]] <- read.csv(textConnection(x))
-    i <-i + 1
+    data_x[[i]] <- fread(x, header = TRUE, sep = ",")
+    # data_x[[i]] <- read.csv(textConnection(x))
+    i <- i + 1
   }
   data_games <- do.call(rbind, data_x)
+  # data_games <- rbindlist(data_x, use.names = TRUE, fill = TRUE)
 }
