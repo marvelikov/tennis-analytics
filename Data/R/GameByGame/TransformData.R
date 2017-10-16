@@ -23,6 +23,7 @@ library(dplyr)
 
 data_raw <- fread("Data/Raw/DataRawGameByGame.csv")
 data_transformed <- data_raw[-grep(pattern = "Davis", x = data_raw$tourney_name),]
+data_transformed <- data_transformed[-grep(pattern = "Olympics", x = data_raw$tourney_name),]
 data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 
 
@@ -115,6 +116,9 @@ data_transformed[win == 0 & !is.na(score_set_2), score_set_2 := str_replace(str_
 data_transformed[win == 0 & !is.na(score_set_3), score_set_3 := str_replace(str_extract(score_set_3, "-\\d{1,}"), "-", "")]
 data_transformed[win == 0 & !is.na(score_set_4), score_set_4 := str_replace(str_extract(score_set_4, "-\\d{1,}"), "-", "")]
 data_transformed[win == 0 & !is.na(score_set_5), score_set_5 := str_replace(str_extract(score_set_5, "-\\d{1,}"), "-", "")]
+
+data_transformed[, top_4 := 0]
+data_transformed[round %in% c("SF", "F"), top_4 := 1]
 
 # Remove old score variable
 data_transformed[, score := NULL]

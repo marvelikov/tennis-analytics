@@ -7,7 +7,7 @@
 
 # Set wanted variables ----------------------------------------------------
 
-start_year <- 2000
+start_year <- 2010
 end_year <- 2016
 split_data_into <- 4
 source("Data/R/ImportSplittedData.R")
@@ -54,6 +54,5 @@ modeling_time <- Sys.time()
 
 # Summary of execution time
 int <- list(start_time, import_time, transform_time, summarise_time, variables_time, modeling_time)
-
 lapply(1:(length(int)-1), function(i) difftime(int[[i+1]], int[[i]], units = "min"))
 
