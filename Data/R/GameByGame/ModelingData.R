@@ -18,7 +18,7 @@ data_pre_modeling <- import_splitted_data(filename = "Data/Cleaned/DataPreModeli
 
 # Transform data for modeling purposes ------------------------------------
 
-cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won_30", "perc_1st_serve_won_365", "perc_2nd_serve_won_30", "perc_2nd_serve_won_365", "perc_return_won_30", "perc_return_won_365", "perc_bp_30", "perc_bp_365", "perc_win_30", "perc_win_365", "game_played_30", "game_played_365", "perc_win_clay", "game_played_clay", "game_played_grass", "game_played_hard", "perc_win_grass", "perc_win_hard", "perc_1st_in_30", "perc_1st_in_365", "top_4_365", "min_played", "surface", "win")
+cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won_30", "perc_1st_serve_won_365", "perc_2nd_serve_won_30", "perc_2nd_serve_won_365", "perc_return_won_30", "perc_return_won_365", "perc_bp_30", "perc_bp_365", "perc_win_30", "perc_win_365", "game_played_30", "game_played_365", "perc_win_clay", "game_played_clay", "game_played_grass", "game_played_hard", "perc_win_grass", "perc_win_hard", "perc_1st_in_30", "perc_1st_in_365", "injury", "top_4", "top_4_GS", "ind_GS", "min_played", "surface", "win")
 data_pre_modeling <- data_pre_modeling[, cols_modeling, with = FALSE]
 
 data_pre_modeling_winner <- data_pre_modeling[win == 1,]

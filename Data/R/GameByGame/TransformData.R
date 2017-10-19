@@ -23,7 +23,7 @@ library(dplyr)
 
 data_raw <- fread("Data/Raw/DataRawGameByGame.csv")
 data_transformed <- data_raw[-grep(pattern = "Davis", x = data_raw$tourney_name),]
-data_transformed <- data_transformed[-grep(pattern = "Olympics", x = data_raw$tourney_name),]
+data_transformed <- data_transformed[-grep(pattern = "Olympics", x = data_transformed$tourney_name),]
 data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 
 
@@ -95,6 +95,8 @@ data_transformed <- data_transformed[order(tourney_id ,tourney_date, match_num)]
 data_transformed[, ind_aband := FALSE]
 data_transformed[grep("RET", score), ind_aband := TRUE]
 data_transformed[grep("W/O", score), ind_aband := TRUE]
+data_transformed[, retired := FALSE]
+data_transformed[ind_aband == TRUE & win == 0, retired := TRUE]
 data_transformed[, score := str_replace_all(score, "RET|W/O|DEF", "")]
 
 data_transformed[, sapply(1:5, function(x) paste0("score_set_", x)) := tstrsplit(score, " ", fixed = TRUE)]
@@ -119,6 +121,17 @@ data_transformed[win == 0 & !is.na(score_set_5), score_set_5 := str_replace(str_
 
 data_transformed[, top_4 := 0]
 data_transformed[round %in% c("SF", "F"), top_4 := 1]
+
+data_transformed[, top_4_GS := 0]
+data_transformed[round %in% c("SF", "F") & tourney_level == "G", top_4_GS := 1]
+
+data_transformed[, ind_GS := 0]
+data_transformed[tourney_level == "G", ind_GS := 1]
+
+data_transformed[, nb_sets := unlist(lapply(.I, function(i) {
+  cols_temp <- c("score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
+  sum(!is.na(data_transformed[i, cols_temp, with = FALSE]))
+}))]
 
 # Remove old score variable
 data_transformed[, score := NULL]

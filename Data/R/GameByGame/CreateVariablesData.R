@@ -34,7 +34,9 @@ data_summarised[, perc_win_365 := win_365/game_played_365]
 data_summarised[, perc_1st_in_30 := `1stIn_30`/svpt_30]
 data_summarised[, perc_1st_in_365 := `1stIn_365`/svpt_365]
 data_summarised[, top_4 := top_4_365]
+data_summarised[, top_4_GS := top_4_GS_99999]
 data_summarised[, min_played := minutes_3]
+data_summarised[, injury := retired_365/game_played_365]
 
 
 
@@ -94,5 +96,6 @@ data_summarised[game_played_hard == 0, perc_win_hard := 0]
 # data_summarised[game_played == 0, ave_pts_game := 0]
 data_summarised[svpt_365 == 0, perc_1st_in_365 := 0]
 data_summarised[svpt_30 == 0, perc_1st_in_30 := 0]
+data_summarised[game_played_365 == 0, injury := 0]
 
 data_pre_modeling <- data_summarised
