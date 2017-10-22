@@ -49,6 +49,21 @@ data_summarised[, game_played_grass_uncertainty := 1/game_played_grass]
 data_summarised[, game_played_hard_uncertainty := 1/game_played_hard]
 
 
+###################################################
+#### For the creation of an alternative output ####
+###################################################
+
+mat <- sapply(1:5, function(i){
+  vec <- data_summarised[,paste0("score_set_",i), with = FALSE]
+  vec[is.na(vec)] <- 0
+  vec
+})
+
+data_summarised[, score_sum := Reduce("+", mat)]
+rm(mat)
+
+
+
 
 # Calculate tennis stats variables/ratios 
 # 
