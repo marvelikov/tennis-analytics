@@ -84,23 +84,30 @@ model <-  keras_model_sequential() %>%
   layer_dense(units = nb_variables) %>%
   layer_activation(activation = 'tanh') %>%
   layer_dropout(rate=0.3) %>%
+  layer_dense(units = nb_variables) %>%
+  layer_activation(activation = 'tanh') %>%
+  layer_dropout(rate=0.3) %>%
   layer_dense(units = 1) %>%
   layer_activation(activation = 'sigmoid')
 
 
-# Compile
+# Compile with custom metric
+K <- backend()
+met <- function(y_true, y_pred){
+  K$mean(1 - K$abs(K$round(y_pred) - K$round(y_true)))
+}
+
 model %>% compile(
   loss = 'mean_squared_error', # We have 0-1 classification...
-  optimizer = 'adam', # To be investigated
-  metrics = c('mean_absolute_error')  
+  optimizer = 'adamax', # To be investigated
+  metrics = c("pred_acc" = met)  
 )
 
 # Fit
 
+
 #batch_size <- 128 # Somewhat arbitrary 
-model %>% fit(x = train_x, y = train_y, batch_size = 1024 , epochs = 50, validation_data = list(test_x, test_y))
+model %>% fit(x = train_x, y = train_y, batch_size = 1024 , epochs = 75, validation_data = list(test_x, test_y))
 model %>% fit(x = train_x, y = train_y, batch_size = 128 , epochs = 25, validation_data = list(test_x, test_y))
 
 
-res <- predict_on_batch(model, test_x) > .5
-sum(abs(res - (test_y > .5)))/ length(test_y)
