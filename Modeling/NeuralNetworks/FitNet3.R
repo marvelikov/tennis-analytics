@@ -15,12 +15,9 @@ data <- fread("Data/Cleaned/DataModeling.csv")
 # data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
 
 
-# Faut que tu ailles roulé les scripts qui construisent le data parce que j'ai rien sauvegardé.
-data <- data_modeling
-
 # Select the response variable and remove others
-data[reponse_variable := p1_perc_game_win]
-data[, -c("p1_win", "p1_perc_game_win"), with = FALSE]
+data[, reponse_variable := p1_perc_game_win]
+data <- data[, -c("p1_win", "p1_perc_game_win"), with = FALSE]
 
 
 
@@ -108,6 +105,7 @@ model %>% compile(
 
 #batch_size <- 128 # Somewhat arbitrary 
 model %>% fit(x = train_x, y = train_y, batch_size = 1024 , epochs = 75, validation_data = list(test_x, test_y))
+model %>% evaluate(test_x, test_y)
 model %>% fit(x = train_x, y = train_y, batch_size = 128 , epochs = 25, validation_data = list(test_x, test_y))
-
+model %>% evaluate(test_x, test_y)
 
