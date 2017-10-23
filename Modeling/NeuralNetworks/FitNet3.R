@@ -27,12 +27,6 @@ data <- na.omit(data)
 data <- data[,-c(1,2,3,4)]
 
 
-###### temporary ###### need to be put in ModelingData maybe...
-data[,p1_win := p1_score_sum/(p1_score_sum + p2_score_sum)]
-data[is.na(p1_win) ,p1_win := .5] #ça je savais pas trop quoi faire... quand (p1_score_sum + p2_score_sum) == 0
-data <- data[,-c("p1_score_sum", "p2_score_sum"), with = FALSE]
-
-
 
 # save names somewhere
 var_types <- sapply(data, class)[-ncol(data)]
