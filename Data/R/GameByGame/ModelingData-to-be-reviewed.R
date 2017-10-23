@@ -12,18 +12,46 @@ library(tidyverse)
 # Import summarised data --------------------------------------------------
 
 #data_pre_modeling <- import_splitted_data(filename = "Data/Cleaned/DataPreModeling", split_number = split_data_into)
-# data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
+data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
 
 
 
 # Transform data for modeling purposes ------------------------------------
 
-#################################
-####### Rajouté score_sum #######
-#################################
+cols_modeling <- c("tourney_date", 
+                   "match_num", 
+                   "tourney_name", 
+                   "name", 
+                   "perc_1st_serve_won_30", 
+                   "perc_1st_serve_won_365", 
+                   "perc_2nd_serve_won_30", 
+                   "perc_2nd_serve_won_365", 
+                   "perc_return_won_30", 
+                   "perc_return_won_365", 
+                   "perc_bp_30", 
+                   "perc_bp_365", 
+                   "perc_win_30", 
+                   "perc_win_365", 
+                   "game_played_30", 
+                   "perc_win_clay", 
+                   "perc_win_grass", 
+                   "perc_win_hard", 
+                   "perc_1st_in_30", 
+                   "perc_1st_in_365", 
+                   "injury", 
+                   "top_4", 
+                   "top_4_GS", 
+                   "ind_GS", 
+                   "min_played", 
+                   "surface",
+                   "game_played_365_uncertainty", 
+                   "game_played_30_uncertainty", 
+                   "game_played_clay_uncertainty", 
+                   "game_played_grass_uncertainty", 
+                   "game_played_hard_uncertainty", 
+                   "score_sum",
+                   "win")
 
-cols_modeling <- c("tourney_date", "match_num", "tourney_name", "name", "perc_1st_serve_won_30", "perc_1st_serve_won_365", "perc_2nd_serve_won_30", "perc_2nd_serve_won_365", "perc_return_won_30", "perc_return_won_365", "perc_bp_30", "perc_bp_365", "perc_win_30", "perc_win_365", "game_played_30", "perc_win_clay", "perc_win_grass", "perc_win_hard", "perc_1st_in_30", "perc_1st_in_365", "injury", "top_4", "top_4_GS", "ind_GS", "min_played", "surface", "win",
-                   "game_played_365_uncertainty", "game_played_30_uncertainty", "game_played_clay_uncertainty", "game_played_grass_uncertainty", "game_played_hard_uncertainty", "score_sum")
 data_pre_modeling <- data_pre_modeling[, cols_modeling, with = FALSE]
 
 data_pre_modeling_winner <- data_pre_modeling[win == 1,]
@@ -85,6 +113,16 @@ colnames(data_modeling) <- new_names
 source("Data/R/GameByGame/SwapColumns.R")
 data_modeling <- swap_cols(data_modeling) %>% select(-tourney_name)
 
-#********************** NOT YET READY **************************
+
+# Create other response variables -----------------------------------------------
+
+data_modeling[, p1_perc_game_win := p1_score_sum/(p1_score_sum + p2_score_sum)]
+data_modeling <- data_modeling[!is.na(p1_perc_game_win),] # On exclut les matchs qui n'ont pas du tout eu lieu ... ca ajoute probablement du noise dans le modele
+
+data_modeling[p1_win == 1, p1_perc_game_win := pmax(0.5, p1_perc_game_win)]
+data_modeling[p1_win == 0, p1_perc_game_win := pmin(0.5, p1_perc_game_win)]
+data_modeling <- data_modeling[,-c("p1_score_sum", "p2_score_sum"), with = FALSE]
+
+
 # Save the data
-#fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
+fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
