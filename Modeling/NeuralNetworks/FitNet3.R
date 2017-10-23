@@ -11,12 +11,17 @@ library(tidyverse)
 # Import/prepare data -----------------------------------------------------
 #####################
 
-# data <- fread("Data/Cleaned/DataModeling.csv")
+data <- fread("Data/Cleaned/DataModeling.csv")
 # data <- fread("https://raw.githubusercontent.com/samperochkin/tennis-analytics/2c4d9ca2430287ab5305e329aa5422328135a2a3/Data/Cleaned/DataModeling.csv")
 
 
 # Faut que tu ailles roulé les scripts qui construisent le data parce que j'ai rien sauvegardé.
 data <- data_modeling
+
+# Select the response variable and remove others
+data[reponse_variable := p1_perc_game_win]
+data[, -c("p1_win", "p1_perc_game_win"), with = FALSE]
+
 
 
 # Remove one year to avoid working with rows full of zeros
@@ -25,13 +30,6 @@ data <- na.omit(data)
 
 # Remove player names date and match num
 data <- data[,-c(1,2,3,4)]
-
-
-###### temporary ###### need to be put in ModelingData maybe...
-data[,p1_win := p1_score_sum/(p1_score_sum + p2_score_sum)]
-data[is.na(p1_win) ,p1_win := .5] #ça je savais pas trop quoi faire... quand (p1_score_sum + p2_score_sum) == 0
-data <- data[,-c("p1_score_sum", "p2_score_sum"), with = FALSE]
-
 
 
 # save names somewhere
@@ -52,9 +50,9 @@ test_ind <- sample(x = c(0,1), size = nrow(data), prob = c(1 - test_pct, test_pc
 
 # Need the variable p1_wins to be defined in the data (in the appropriate script)
 train_x <- subset(data, subset = as.logical(1-test_ind), select = var_names)
-train_y <- subset(data, subset = as.logical(1-test_ind), select = "p1_win")
+train_y <- subset(data, subset = as.logical(1-test_ind), select = "reponse_variable")
 test_x <- subset(data, subset = as.logical(test_ind), select = var_names)
-test_y <- subset(data, subset = as.logical(test_ind), select = "p1_win")
+test_y <- subset(data, subset = as.logical(test_ind), select = "reponse_variable")
 #rm(data)
 
 # Normalize the columns we want to normalize...
