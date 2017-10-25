@@ -12,7 +12,7 @@ library(tidyverse)
 # Import summarised data --------------------------------------------------
 
 #data_pre_modeling <- import_splitted_data(filename = "Data/Cleaned/DataPreModeling", split_number = split_data_into)
-data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
+#data_pre_modeling <- fread("Data/Cleaned/DataPreModeling.csv")
 
 
 
@@ -49,6 +49,7 @@ cols_modeling <- c("tourney_date",
                    "game_played_clay_uncertainty", 
                    "game_played_grass_uncertainty", 
                    "game_played_hard_uncertainty", 
+                   "retired",
                    "score_sum",
                    "win")
 
