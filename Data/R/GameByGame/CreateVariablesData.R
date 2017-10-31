@@ -49,6 +49,7 @@ data_summarised[, game_played_grass_uncertainty := 1/game_played_grass]
 data_summarised[, game_played_hard_uncertainty := 1/game_played_hard]
 
 
+
 # Create new response variable --------------------------------------------
 
 data_summarised[, score_sum := unlist(lapply(.I, function(i) {
