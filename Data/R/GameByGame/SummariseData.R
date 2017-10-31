@@ -19,20 +19,51 @@ data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
 # Summarise data  ---------------------------------------------------------
 
 # Here we define the columns we need to create our variables with the timeframe (to summarised) associated to each columns 
+# variables_to_summarise <- list(
+#                             serve_point = list(var = "svpt", time_frame = 365, split = NULL), 
+#                             first_serve_in = list(var = "1stIn", time_frame = 365, split = NULL),
+#                             first_serve_won = list(var = "1stWon", time_frame = 365, split = NULL),
+#                             second_serve_won = list(var = "2ndWon", time_frame = 365, split = NULL), 
+#                             bp_faced = list(var = "bpFaced", time_frame = 365, split = NULL), 
+#                             bp_saved = list(var = "bpSaved", time_frame = 365), 
+#                             return_point_won = list(var = "rpt_won", time_frame = 365, split = NULL), 
+#                             return_point = list(var = "rpt", time_frame = 365, split = NULL),
+#                             win = list(var = "win", time_frame = 30, split = NULL),
+#                             loss = list(var = "loss", time_frame = 30, split = NULL),
+#                             win = list(var = "win", time_frame = 365, split = NULL),
+#                             loss = list(var = "loss", time_frame = 365, split = NULL),
+#                             win = list(var = "win", time_frame = (3 * 365), split = "surface"), 
+#                             loss = list(var = "loss", time_frame = (3 * 365), split = "surface")
+#                             )
+
 variables_to_summarise <- list(
-                            serve_point = list(var = "svpt", time_frame = 365, split = NULL), 
-                            first_serve_in = list(var = "1stIn", time_frame = 365, split = NULL),
-                            first_serve_won = list(var = "1stWon", time_frame = 365, split = NULL),
-                            second_serve_won = list(var = "2ndWon", time_frame = 365, split = NULL), 
-                            bp_faced = list(var = "bpFaced", time_frame = 365, split = NULL), 
-                            bp_saved = list(var = "bpSaved", time_frame = 365), 
-                            return_point_won = list(var = "rpt_won", time_frame = 365, split = NULL), 
-                            return_point = list(var = "rpt", time_frame = 365, split = NULL),
-                            win = list(var = "win", time_frame = 365, split = NULL),
-                            loss = list(var = "loss", time_frame = 365, split = NULL),
-                            win = list(var = "win", time_frame = (3 * 365), split = "surface"), 
-                            loss = list(var = "loss", time_frame = (3 * 365), split = "surface")
-                            )
+  serve_point = list(var = "svpt", time_frame = 365, split = NULL), 
+  first_serve_in = list(var = "1stIn", time_frame = 365, split = NULL),
+  first_serve_won = list(var = "1stWon", time_frame = 365, split = NULL),
+  second_serve_won = list(var = "2ndWon", time_frame = 365, split = NULL), 
+  bp_faced = list(var = "bpFaced", time_frame = 365, split = NULL), 
+  bp_saved = list(var = "bpSaved", time_frame = 365, split = NULL), 
+  return_point_won = list(var = "rpt_won", time_frame = 365, split = NULL), 
+  return_point = list(var = "rpt", time_frame = 365, split = NULL),
+  win = list(var = "win", time_frame = 365, split = NULL),
+  loss = list(var = "loss", time_frame = 365, split = NULL),
+  top_4 = list(var = "top_4", time_frame = 365, split = NULL),
+  top_4_GS = list(var = "top_4_GS", time_frame = 99999, split = NULL),
+  retired <- list(var = "retired", time_frame = 365, split = NULL),
+  win = list(var = "win", time_frame = 99999, split = "surface"), 
+  loss = list(var = "loss", time_frame = 99999, split = "surface"),
+  serve_point = list(var = "svpt", time_frame = 30, split = NULL), 
+  first_serve_in = list(var = "1stIn", time_frame = 30, split = NULL),
+  first_serve_won = list(var = "1stWon", time_frame = 30, split = NULL),
+  second_serve_won = list(var = "2ndWon", time_frame = 30, split = NULL), 
+  bp_faced = list(var = "bpFaced", time_frame = 30, split = NULL), 
+  bp_saved = list(var = "bpSaved", time_frame = 30, split = NULL), 
+  return_point_won = list(var = "rpt_won", time_frame = 30, split = NULL), 
+  return_point = list(var = "rpt", time_frame = 30, split = NULL),
+  win = list(var = "win", time_frame = 30, split = NULL),
+  loss = list(var = "loss", time_frame = 30, split = NULL),
+  min_played = list(var = "minutes", time_frame = 3, split = NULL)
+)
 
 unique_tf <- unique(unlist(lapply(variables_to_summarise, function(x) x[["time_frame"]])))
 
@@ -41,7 +72,9 @@ unique_tf <- unique(unlist(lapply(variables_to_summarise, function(x) x[["time_f
 # back these indices to summarise our data by different variables
 sapply(X = unique_tf, FUN = function(time) {
   col_name = paste0("targeted_rows_", time)
-  data_transformed[, (col_name) := sapply(X = 1:nrow(data_transformed), FUN = function(i) {which(difftime(data_transformed$tourney_date[i], data_transformed$tourney_date, units = "days") < time & (difftime(data_transformed$tourney_date[i], data_transformed$tourney_date, units = "days") > 0 | (difftime(data_transformed$tourney_date[i], data_transformed$tourney_date, units = "days") == 0 & data_transformed$match_num[i] > data_transformed$match_num)) & data_transformed$name[i] == data_transformed$name)})]
+  data_transformed[, (col_name) := sapply(X = 1:nrow(data_transformed), FUN = function(i) {
+    print(paste(i, time))
+    return(which(difftime(data_transformed$tourney_date[i], data_transformed$tourney_date, units = "days") < time & (difftime(data_transformed$tourney_date[i], data_transformed$tourney_date, units = "days") > 0 | (difftime(data_transformed$tourney_date[i], data_transformed$tourney_date, units = "days") == 0 & data_transformed$match_num[i] > data_transformed$match_num)) & data_transformed$name[i] == data_transformed$name))})]
 })
 
 

@@ -47,10 +47,18 @@ test_y <- subset(data, subset = as.logical(test_ind), select = "p1_win")
 # Normalize the columns we want to normalize...
 
 # watch out here. Might not always work when we add variables...
-numeric_variables <- which(var_types == "numeric" & var_types != "integer")
+not_to_scale <- c("grass", "clay", "hard", unlist(sapply(c("injury", "game_played_30_uncertainty", "game_played_365_uncertainty",
+                                                           "game_played_clay_uncertainty", "game_played_hard_uncertainty",
+                                                           "game_played_grass_uncertainty", "top_4_GS"),
+                function(nn){
+                  paste0(c("p1_", "p2_"), nn)
+}, simplify = FALSE, USE.NAMES = FALSE)))
+                  
 
-train_x[,numeric_variables] <- scale(train_x[,numeric_variables], center = TRUE)
-test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
+to_scale <- setdiff(var_names, not_to_scale)
+
+train_x[,to_scale] <- scale(train_x[,to_scale], center = TRUE)
+test_x[,to_scale] <- scale(test_x[,to_scale], center = TRUE)
 
 
 
@@ -59,10 +67,12 @@ test_x[,numeric_variables] <- scale(test_x[,numeric_variables], center = TRUE)
 #i.e number of digits from 0 to 9
 
 model <-  keras_model_sequential() %>%
-  #layer_dense(units = floor(nb_variables/2), input_shape = nb_variables) %>%
-  layer_dense(units = floor(nb_variables), input_shape = nb_variables) %>%
-  layer_activation(activation = 'relu') %>%
-  layer_dropout(rate=0.1) %>%
+  layer_dense(units = 2 * nb_variables, input_shape = nb_variables) %>%
+  layer_activation(activation = 'tanh') %>%
+  layer_dropout(rate=0.3) %>%
+  layer_dense(units = nb_variables) %>%
+  layer_activation(activation = 'tanh') %>%
+  layer_dropout(rate=0.3) %>%
   layer_dense(units = 1) %>%
   layer_activation(activation = 'sigmoid')
 
@@ -78,12 +88,8 @@ model %>% compile(
 # Fit
 
 #batch_size <- 128 # Somewhat arbitrary 
-model %>% fit(x = train_x, y = train_y, epochs = 15)
-
-#Evaluating model on the cross validation dataset
-model %>% evaluate(test_x, test_y)
-
-
+model %>% fit(x = train_x, y = train_y, batch_size = 1024 , epochs = 50, validation_data = list(test_x, test_y))
+model %>% fit(x = train_x, y = train_y, batch_size = 128 , epochs = 100, validation_data = list(test_x, test_y))
 
 
 
