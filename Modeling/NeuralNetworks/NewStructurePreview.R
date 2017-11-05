@@ -13,18 +13,19 @@ for(i in seq_along(names)){
 }
 
 # An input layers for the conditions in which the match is played (surface, weather, etc...)
-conditions_layer <-   layer_dense(units = 10 * nb_variables, activation = "tanh", input_shape = nb_variables) %>%
-  layer_dropout(rate = 0.4)
+conditions_layer <-   layer_dense(units = nb_env, activation = "identity", input_shape = nb_env)
 
 # We put all that together into one input layer for a feedforward!
 input_layers <- c(players_layers, list(conditions_layer))
 
-predictions <- layer_concatenate((input_layers, recursive = FALSE), axis=-1) %>%
-  layer_dense(units = 10 * nb_variables, activation = "tanh") %>%
+nb_hidden <- 5 * (nb_variables + nb_env)
+
+predictions <- layer_concatenate(input_layers, axis=-1) %>%
+  layer_dense(units = nb_hidden, activation = "tanh") %>%
   layer_dropout(rate = 0.4) %>%
-  layer_dense(units = 10 * nb_variables, activation = "tanh") %>%
+  layer_dense(units = 10 * nb_hidden, activation = "tanh") %>%
   layer_dropout(rate = 0.4) %>%
-  layer_dense(units = 10 * nb_variables, activation = "tanh") %>%
+  layer_dense(units = 10 * nb_hidden, activation = "tanh") %>%
   layer_dropout(rate = 0.4) %>%
   layer_dense(units = 1, activation = 'sigmoid')
 
