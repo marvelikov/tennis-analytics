@@ -49,7 +49,9 @@ info_match <- data_transformed %>% select(c(starts_with("tourney"), surface, dra
 stats_match <- data_transformed %>% select(minutes, score)
 
 
+# ****************IMPORTANT******************
 
+# Need to divide varying info_p and fixed info_p !!!
 
 
 
@@ -68,8 +70,8 @@ stats_match <- data_transformed %>% select(minutes, score)
 
 # We could think of using a two-line data.table too: easier to get overall info
 
-food <- data_transformed
-food2 <- fread("Data/Cleaned/DataTransformed.csv")
+data_one <- data_transformed
+data_two <- fread("Data/Cleaned/DataTransformed.csv")
 
 # Missing player_id!!!!!
 
@@ -82,23 +84,29 @@ food2 <- fread("Data/Cleaned/DataTransformed.csv")
 
 # a list of the players' last game
 
-# player_id <- unique(food2$player_id)
-#last <- replicate(expr = rep(0, 2*ncol(stats_p1)), n = length(player_id))
+# player_id <- unique(data_two$player_id)
+#last_stats <- replicate(expr = rep(0, 2*ncol(stats_p1)), n = length(player_id))
 
 
-#for(i in 1:nrow(info_match)){
+# match_id <- unique(data_one$match_id) # Should be sorted
+#for(m_id in match_id){
+    
+  # We want the infos and store the stats in "last"  
   
+  #last_stats_p1 <- c(last_stats[[p1_id]],last_stats[[p2_id]])
+  #last_stats_p2 <- c(last_stats[[p2_id]],last_stats[[p1_id]])
+
+  #last_stats[[p1_id]] <- c(stats_p1[m_id,],stats_p2[m_id,])
+  #last_stats[[p2_id]] <- c(stats_p2[m_id,],stats_p1[m_id,])
+
+
+  # We leave space for the representation of their last opponents
+  
+  #last_opp_rep <- 10 # Need to adjust!
+  #new_line <- c(info_p1,last_p1, last_opp_rep,info_p2,last_p2,info_match[m_id])
+
 #} 
   
-  
-  
-  
-  
-  
-  
-  
-  
-}
 
 
 
