@@ -20,38 +20,37 @@ library(dplyr)
 # Import raw data ---------------------------------------------------------
 
 data_raw <- fread("Data/Raw/DataRawGameByGame.csv")
-data_transformed <- data_raw[-grep(pattern = "Davis", x = data_raw$tourney_name),]
-data_transformed <- data_transformed[-grep(pattern = "Olympics", x = data_transformed$tourney_name),]
-data_transformed$tourney_date <- ymd(data_transformed$tourney_date)
+data <- data_raw[-grep(pattern = "Davis", x = data_raw$tourney_name),]
+data <- data[-grep(pattern = "Olympics", x = data$tourney_name),]
+data$tourney_date <- ymd(data$tourney_date)
 
 
 
 
 # Make sure we have a well-ordered data.table -----------------------------
 
-data_transformed <- arrange(data_transformed, tourney_date, tourney_id, match_num)
+data <- arrange(data, tourney_date, tourney_id, match_num)
 
 
 
 # Get info of players, stats of players and match info
 
-info_p1 <- data_transformed %>% select(starts_with("winner"))
-info_p2 <- data_transformed %>% select(starts_with("loser"))
+info_p1 <- data %>% select(starts_with("winner"))
+info_p2 <- data %>% select(starts_with("loser"))
 
-stats_p1 <- data_transformed %>% select(starts_with("w_"))
-stats_p2 <- data_transformed %>% select(starts_with("l_"))
+stats_p1 <- data %>% select(starts_with("w_"))
+stats_p2 <- data %>% select(starts_with("l_"))
 
 
-#data_match <- data_transformed %>% select(-c(starts_with("winner"),starts_with("loser"),starts_with("w_"),starts_with("l_")))
+#data_match <- data %>% select(-c(starts_with("winner"),starts_with("loser"),starts_with("w_"),starts_with("l_")))
 #data_match
 
-info_match <- data_transformed %>% select(c(starts_with("tourney"), surface, draw_size, best_of, round))
-stats_match <- data_transformed %>% select(minutes, score)
+info_match <- data %>% select(c(starts_with("tourney"), surface, draw_size, best_of, round))
+stats_match <- data %>% select(minutes, score)
 
 
-# ****************IMPORTANT******************
-
-# Need to divide varying info_p and fixed info_p !!!
+# ****************NOTE******************
+# Might need to divide varying info_p and fixed info_p...
 
 
 
@@ -60,6 +59,32 @@ stats_match <- data_transformed %>% select(minutes, score)
 #######################
 
 # Here we should treat each variable seperately, selecting and formatting them as wished
+
+## SOME OF THIS COULD BE DONE ON data_one.. (Should?)
+info_p1 <- as.data.table(info_p1)
+info_p2 <- as.data.table(info_p2)
+
+# winner/loser_seed -------------------------------------------------------
+info_p1[is.na(winner_seed), winner_seed := 0]
+info_p2[is.na(loser_seed), loser_seed := 0]
+
+
+# winner/loser_entry ------------------------------------------------------
+
+# we want the natural order of
+#> info_p2[,unique(loser_entry)]
+#[1] ""   "Q"  "WC" "LL" "PR" "S"  "SE"
+# given by [TO BE DETERMINED!]
+info_p1[, winner_entry := sapply(info_p1$winner_entry,function(en){which.max(en == c("","WC","Q","LL","PR","S","SE"))})]
+info_p2[, loser_entry := sapply(info_p2$loser_entry,function(en){which.max(en == c("","WC","Q","LL","PR","S","SE"))})]
+
+
+
+name_factors <- unique(c(info_p1$winner_name,info_p2$loser_name))
+info_p1[, winner_name := factor(winner_name, levels = name_factors)]
+info_p2[, loser_name := factor(loser_name, levels = name_factors)]
+# Preferably, we would us data_two?
+
 
 # I prefer to focus on an actual frame for constructing the data from the processed variables.
 # Anyways, we need to build something that is flexible in its input, so that we can re-use it...
@@ -70,10 +95,12 @@ stats_match <- data_transformed %>% select(minutes, score)
 
 # We could think of using a two-line data.table too: easier to get overall info
 
-data_one <- data_transformed
+data_one <- data
 data_two <- fread("Data/Cleaned/DataTransformed.csv")
 
-# Missing player_id!!!!!
+# Missing player_id. Here is a cheap trick...
+data_two[, player_id := as.numeric(factor(name))]
+
 
 ###################
 # Loop construction -------------------------------------------------------
