@@ -95,23 +95,63 @@ info_p2[, loser_name := factor(loser_name, levels = name_factors)]
 
 # We could think of using a two-line data.table too: easier to get overall info
 
-data_one <- data
+data_one <- data.table(data)
 data_two <- fread("Data/Cleaned/DataTransformed.csv")
 
 # Missing player_id. Here is a cheap trick...
 data_two[, player_id := as.numeric(factor(name))]
+
+# We create a match_id
+data_one$match_id <- seq(1:nrow(data_one))
+data_two$tourney_date <- ymd(data_two$tourney_date)
+
+# We push the match_id into the data_two dataset
+data_two_w <- data_two[win == 1,]
+data_two_l <- data_two[win == 0,]
+
+setkey(data_one, tourney_name, tourney_date, winner_name, match_num)
+setkey(data_two_w, tourney_name, tourney_date, name, match_num)
+data_two_w[data_one, match_id := match_id]
+
+setkey(data_one, tourney_name, tourney_date, loser_name, match_num)
+setkey(data_two_l, tourney_name, tourney_date, name, match_num)
+data_two_l[data_one, match_id := match_id]
+
+data_two <- rbindlist(list(data_two_w, data_two_l))
+
+
+# We create the new data_history: contains drifted data that will be give as input to the net
+# We begin the set the general variables
+data_history <- select(data_one, match_id, tourney_name, surface, tourney_date, winner_id, loser_id)
+
+# Set the variables (stats) to pick up in each game
+var_stats <- c("minutes", "ace", "df", "svpt", "1stIn", "1stWon", "2ndWon", "SvGms", "bpSaved", "bpFaced", "rpt_won", "score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
+sapply(var_stats, function(name) {
+  data_history[, c(paste0("w_", name)) := unlist(lapply(.I, function(i) {
+    temp <- last(data_two[match_id < i & id == data_history[i, winner_id], c(name), with = FALSE])
+    if(nrow(temp)>0){temp}else{rep(NA)}
+  }))]
+})
+
+sapply(var_stats, function(name) {
+  data_history[, c(paste0("l_", name)) := unlist(lapply(.I, function(i) {
+    temp <- last(data_two[match_id < i & id == data_history[i, loser_id], c(name), with = FALSE])
+    if(nrow(temp)>0){temp}else{rep(NA)}
+  }))]
+})
 
 
 ###################
 # Loop construction -------------------------------------------------------
 ###################
 
+player_id <- unique(data_two$player_id)
 
+list_representation <- list(NA)
+list_opponents <- list(rep(NA, length(player_id)))
 
 
 # a list of the players' last game
-
-# player_id <- unique(data_two$player_id)
 #last_stats <- replicate(expr = rep(0, 2*ncol(stats_p1)), n = length(player_id))
 
 
