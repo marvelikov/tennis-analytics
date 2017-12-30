@@ -1,5 +1,6 @@
-# Description:  We investigate a new net structure. We begin by formating the data appropriately. Ultimately, all this should be done
-#               in different files.
+# Description:  We investigate a new net structure. This is a toy net with only two players.
+
+# Future tasks are written down at the end.
 
 library(tidyverse)
 library(data.table)
@@ -52,3 +53,22 @@ feed_output <- feed_input %>%
   
 
 model <- keras_model(inputs = inputs, outputs = feed_output)
+
+
+
+
+##############
+# Future tasks ------------------------------------------------------------
+##############
+
+# 1. Properly define rec_input and output so that it makes sense:
+
+#     length(rec_input) = length(stats_input) + 
+#                            length(opp_stats_input) + 
+#                            length(opp_info_input) + 
+#                            length(rec_output) + 
+#                            length(match_input)
+
+
+
+# 2. Maybe add some layer_dropout in the dense net? Or try to keep it smaller to run on CPU? 
