@@ -25,28 +25,24 @@ data <- data[-grep(pattern = "Olympics", x = data$tourney_name),]
 data$tourney_date <- ymd(data$tourney_date)
 
 
-
-
 # Make sure we have a well-ordered data.table -----------------------------
 
 data <- arrange(data, tourney_date, tourney_id, match_num)
 
-
-
 # Get info of players, stats of players and match info
 
-info_p1 <- data %>% select(starts_with("winner"))
-info_p2 <- data %>% select(starts_with("loser"))
-
-stats_p1 <- data %>% select(starts_with("w_"))
-stats_p2 <- data %>% select(starts_with("l_"))
+# info_p1 <- data %>% select(starts_with("winner"))
+# info_p2 <- data %>% select(starts_with("loser"))
+# 
+# stats_p1 <- data %>% select(starts_with("w_"))
+# stats_p2 <- data %>% select(starts_with("l_"))
 
 
 #data_match <- data %>% select(-c(starts_with("winner"),starts_with("loser"),starts_with("w_"),starts_with("l_")))
 #data_match
 
-info_match <- data %>% select(c(starts_with("tourney"), surface, draw_size, best_of, round))
-stats_match <- data %>% select(minutes, score)
+# info_match <- data %>% select(c(starts_with("tourney"), surface, draw_size, best_of, round))
+# stats_match <- data %>% select(minutes, score)
 
 
 # ****************NOTE******************
@@ -61,12 +57,12 @@ stats_match <- data %>% select(minutes, score)
 # Here we should treat each variable seperately, selecting and formatting them as wished
 
 ## SOME OF THIS COULD BE DONE ON data_one.. (Should?)
-info_p1 <- as.data.table(info_p1)
-info_p2 <- as.data.table(info_p2)
+# info_p1 <- as.data.table(info_p1)
+# info_p2 <- as.data.table(info_p2)
 
 # winner/loser_seed -------------------------------------------------------
-info_p1[is.na(winner_seed), winner_seed := 0]
-info_p2[is.na(loser_seed), loser_seed := 0]
+# info_p1[is.na(winner_seed), winner_seed := 0]
+# info_p2[is.na(loser_seed), loser_seed := 0]
 
 
 # winner/loser_entry ------------------------------------------------------
@@ -74,15 +70,15 @@ info_p2[is.na(loser_seed), loser_seed := 0]
 # we want the natural order of
 #> info_p2[,unique(loser_entry)]
 #[1] ""   "Q"  "WC" "LL" "PR" "S"  "SE"
-# given by [TO BE DETERMINED!]
-info_p1[, winner_entry := sapply(info_p1$winner_entry,function(en){which.max(en == c("","WC","Q","LL","PR","S","SE"))})]
-info_p2[, loser_entry := sapply(info_p2$loser_entry,function(en){which.max(en == c("","WC","Q","LL","PR","S","SE"))})]
-
-
-
-name_factors <- unique(c(info_p1$winner_name,info_p2$loser_name))
-info_p1[, winner_name := factor(winner_name, levels = name_factors)]
-info_p2[, loser_name := factor(loser_name, levels = name_factors)]
+# # given by [TO BE DETERMINED!]
+# info_p1[, winner_entry := sapply(info_p1$winner_entry,function(en){which.max(en == c("","WC","Q","LL","PR","S","SE"))})]
+# info_p2[, loser_entry := sapply(info_p2$loser_entry,function(en){which.max(en == c("","WC","Q","LL","PR","S","SE"))})]
+# 
+# 
+# 
+# name_factors <- unique(c(info_p1$winner_name,info_p2$loser_name))
+# info_p1[, winner_name := factor(winner_name, levels = name_factors)]
+# info_p2[, loser_name := factor(loser_name, levels = name_factors)]
 # Preferably, we would us data_two?
 
 
@@ -122,7 +118,7 @@ data_two <- rbindlist(list(data_two_w, data_two_l))
 
 # We create the new data_history: contains drifted data that will be give as input to the net
 # We begin the set the general variables
-data_history <- data.table(select(data_one, match_id, tourney_name, surface, tourney_date, winner_id, loser_id))
+data_history <- data.table(select(data_one, match_id, tourney_name, surface, tourney_date, draw_size, winner_id, loser_id))
 
 # Find the last match_id and opponent_id id for each game played
 data_history[, w_last_match_id := unlist(lapply(.I, function(i) {
@@ -143,7 +139,7 @@ data_history[, l_last_opp_id := unlist(lapply(.I, function(i) {
 }))]
 
 # Set the variables (stats) to pick up in each game
-var_stats <- c("minutes", "ace", "df", "svpt", "1stIn", "1stWon", "2ndWon", "SvGms", "bpSaved", "bpFaced", "rpt_won", "score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
+var_stats <- c("hand", "ht", "ioc", "age", "rank", "minutes", "ace", "df", "svpt", "1stIn", "1stWon", "2ndWon", "SvGms", "bpSaved", "bpFaced", "rpt_won", "score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
 
 setkey(data_two, match_id, id)
 # Find the stats of the last game for the winner
@@ -164,10 +160,10 @@ data_history[data_two, c(paste0("l_opp_", var_stats)) := mget(var_stats)]
 # Loop construction -------------------------------------------------------
 ###################
 
-player_id <- unique(data_two$player_id)
-
-list_representation <- list(NA)
-list_opponents <- list(rep(NA, length(player_id)))
+# player_id <- unique(data_two$player_id)
+# 
+# list_representation <- list(NA)
+# list_opponents <- list(rep(NA, length(player_id)))
 
 
 # a list of the players' last game
