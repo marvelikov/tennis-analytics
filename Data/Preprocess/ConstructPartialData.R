@@ -115,6 +115,11 @@ data_two_l[data_one, match_id := match_id]
 
 data_two <- rbindlist(list(data_two_w, data_two_l))
 
+# Expand hand variable
+data_two[, right := 0]
+data_two[hand == "R", right := 1]
+data_two[, left := 0]
+data_two[hand == "L", left := 1]
 
 # We create the new data_history: contains drifted data that will be give as input to the net
 # We begin the set the general variables
@@ -139,21 +144,21 @@ data_history[, l_last_opp_id := unlist(lapply(.I, function(i) {
 }))]
 
 # Set the variables (stats) to pick up in each game
-var_stats <- c("hand", "ht", "ioc", "age", "rank", "minutes", "ace", "df", "svpt", "1stIn", "1stWon", "2ndWon", "SvGms", "bpSaved", "bpFaced", "rpt_won", "score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
+var_stats <- c("right", "left", "ht", "ioc", "age", "rank", "minutes", "ace", "df", "svpt", "1stIn", "1stWon", "2ndWon", "SvGms", "bpSaved", "bpFaced", "rpt_won", "score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
 
 setkey(data_two, match_id, id)
 # Find the stats of the last game for the winner
 setkey(data_history, w_last_match_id, winner_id)
-data_history[data_two, c(paste0("w_", var_stats)) := mget(var_stats)]
+data_history[data_two, c(paste0("p1_", var_stats)) := mget(var_stats)]
 # Find the stats of the last game for the winner's opponent
 setkey(data_history, w_last_match_id, w_last_opp_id)
-data_history[data_two, c(paste0("w_opp_", var_stats)) := mget(var_stats)]
+data_history[data_two, c(paste0("p1_opp_", var_stats)) := mget(var_stats)]
 # Find the stats of the last game for the winner
 setkey(data_history, l_last_match_id, loser_id)
-data_history[data_two, c(paste0("l_", var_stats)) := mget(var_stats)]
+data_history[data_two, c(paste0("p2_", var_stats)) := mget(var_stats)]
 # Find the stats of the last game for the winner
 setkey(data_history, l_last_match_id, l_last_match_id)
-data_history[data_two, c(paste0("l_opp_", var_stats)) := mget(var_stats)]
+data_history[data_two, c(paste0("p2_opp_", var_stats)) := mget(var_stats)]
 
 
 ###################
