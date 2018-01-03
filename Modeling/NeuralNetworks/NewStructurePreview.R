@@ -79,6 +79,14 @@ data_history[, month := month(tourney_date)]
 data_history[, year := year(tourney_date)]
 data_history[, tourney_date := NULL]
 
+# Use more information via
+#data_history[, tourney_latitude := latitude_function(tourney_name)]
+#data_history[, tourney_longitude := longitude_function(tourney_name)]
+#data_history[, tourney_altitude := altitude_function(tourney_name)]
+#data_history[, tourney_name := embedding_function(tourney_name)]
+
+
+
 # We need to arrange the data in order to be coherent with the feed_input
 info_variables <- c("right", "left", "ht", "age", "rank")
 p1_info_variables <- paste0("p1_", info_variables)
@@ -89,6 +97,8 @@ p1_rec_variables <- c(paste0("p1_", stats_variables), paste0("p1_opp_", stats_va
 p2_rec_variables <- c(paste0("p2_", stats_variables), paste0("p2_opp_", stats_variables), paste0("p2_opp_", info_variables))
 
 match_info_variables <- c("grass", "hard", "clay", "year", "month", "day", "draw_size")
+
+
 
 train_x <- data_history[, (c(p1_info_variables, p1_rec_variables, p2_info_variables, p2_rec_variables, match_info_variables)), with = FALSE]
 train_y <- 
@@ -119,14 +129,15 @@ p2_rec_output <- p2_rec_input %>%
 feed_input <- layer_concatenate(list(p1_info_input,p1_rec_output,p2_info_input,p2_rec_output,match_info_input))
 
 feed_output <- feed_input %>%
-  layer_dense(110) %>%
-  layer_dense(55) %>%
-  layer_dense(55) %>%
-  layer_dense(55) %>%
+  layer_dense(100) %>%
+  layer_dense(75) %>%
+  layer_dense(50) %>%
+  layer_dense(50) %>%
   layer_dense(1)
 
 
 model <- keras_model(inputs = inputs, outputs = feed_output)
 
+data_history
 
 test <- model %>% fit()
