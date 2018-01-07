@@ -123,23 +123,23 @@ data_two[hand == "L", left := 1]
 
 # We create the new data_history: contains drifted data that will be give as input to the net
 # We begin the set the general variables
-data_history <- data.table(select(data_one, match_id, tourney_name, surface, tourney_date, draw_size, winner_id, loser_id))
+data_history <- data.table(select(data_one, match_id, tourney_name, surface, tourney_date, draw_size, p1_id = winner_id, p2_id = loser_id))
 
 # Find the last match_id and opponent_id id for each game played
-data_history[, w_last_match_id := unlist(lapply(.I, function(i) {
-  temp <- last(data_two[match_id < data_history[i, match_id] & id == data_history[i, winner_id],][order(tourney_date, match_num), match_id])
+data_history[, p1_last_match_id := unlist(lapply(.I, function(i) {
+  temp <- last(data_two[match_id < data_history[i, match_id] & id == data_history[i, p1_id],][order(tourney_date, match_num), match_id])
   if(length(temp)>0){temp}else{NA_integer_}
 }))]
-data_history[, w_last_opp_id := unlist(lapply(.I, function(i) {
-  temp <- data_two[match_id == data_history[i, w_last_match_id] & id != data_history[i, winner_id], id]
+data_history[, p1_last_opp_id := unlist(lapply(.I, function(i) {
+  temp <- data_two[match_id == data_history[i, p1_last_match_id] & id != data_history[i, p1_id], id]
   if(length(temp)>0){temp}else{NA_integer_}
 }))]
-data_history[, l_last_match_id := unlist(lapply(.I, function(i) {
-  temp <- last(data_two[match_id < data_history[i, match_id] & id == data_history[i, loser_id],][order(tourney_date, match_num), match_id])
+data_history[, p2_last_match_id := unlist(lapply(.I, function(i) {
+  temp <- last(data_two[match_id < data_history[i, match_id] & id == data_history[i, p2_id],][order(tourney_date, match_num), match_id])
   if(length(temp)>0){temp}else{NA_integer_}
 }))]
-data_history[, l_last_opp_id := unlist(lapply(.I, function(i) {
-  temp <- data_two[match_id == data_history[i, l_last_match_id] & id != data_history[i, loser_id], id]
+data_history[, p2_last_opp_id := unlist(lapply(.I, function(i) {
+  temp <- data_two[match_id == data_history[i, p2_last_match_id] & id != data_history[i, p2_id], id]
   if(length(temp)>0){temp}else{NA_integer_}
 }))]
 
@@ -148,16 +148,16 @@ var_stats <- c("right", "left", "ht", "ioc", "age", "rank", "minutes", "ace", "d
 
 setkey(data_two, match_id, id)
 # Find the stats of the last game for the winner
-setkey(data_history, w_last_match_id, winner_id)
+setkey(data_history, p1_last_match_id, p1_id)
 data_history[data_two, c(paste0("p1_", var_stats)) := mget(var_stats)]
 # Find the stats of the last game for the winner's opponent
-setkey(data_history, w_last_match_id, w_last_opp_id)
+setkey(data_history, p1_last_match_id, p1_last_opp_id)
 data_history[data_two, c(paste0("p1_opp_", var_stats)) := mget(var_stats)]
 # Find the stats of the last game for the winner
-setkey(data_history, l_last_match_id, loser_id)
+setkey(data_history, p2_last_match_id, p2_id)
 data_history[data_two, c(paste0("p2_", var_stats)) := mget(var_stats)]
 # Find the stats of the last game for the winner
-setkey(data_history, l_last_match_id, l_last_match_id)
+setkey(data_history, p2_last_match_id, p2_last_opp_id)
 data_history[data_two, c(paste0("p2_opp_", var_stats)) := mget(var_stats)]
 
 
