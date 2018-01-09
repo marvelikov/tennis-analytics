@@ -90,7 +90,7 @@ data_history[, tourney_date := NULL]
 
 
 data_history
-# There still are some winner_ , loser_ , w_ , l_ in there...
+# There still are some winner_ , loser_ , w_ , l_ in there... Now OK !!
 # Also, many values are NA.
 
 
@@ -100,32 +100,28 @@ p1_info_variables <- paste0("p1_", info_variables)
 p2_info_variables <- paste0("p2_", info_variables)
 
 
-# need split in two: match_stats = c("minutes",...)   and   players_stats = c("ace",...)
-stats_variables <- c("minutes", "ace", "df", "svpt", "1stIn", "1stWon", "2ndWon", "SvGms", "bpSaved", "bpFaced", "rpt_won", "score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
+# need split in two: match_stats = c("minutes",...)   and   players_stats = c("ace",...) ... Done !
+match_stats_variables <- c("minutes")
+player_stats_variables <- c("ace", "df", "svpt", "1stIn", "1stWon", "2ndWon", "SvGms", "bpSaved", "bpFaced", "rpt_won", "score_set_1", "score_set_2", "score_set_3", "score_set_4", "score_set_5")
 
-# constrcut the data for p1_rec in three parts + match_stats + match_info
-p1_stats_variables <- paste0("p1_", stats_variables) 
-p1_opp_stats_variables <- paste0("p1_opp_", stats_variables)
+# Define the variables for p1 last game (at this moment we only miss the opp rep)
+p1_match_stats <- paste0("p1_", match_stats_variables) 
+p1_stats_variables <- paste0("p1_", player_stats_variables) 
+p1_opp_stats_variables <- paste0("p1_opp_", player_stats_variables)
 p1_opp_info_variables <- paste0("p1_opp_", info_variables)
-#p1_match_stats <- 
 
-
-p2_stats_variables <- paste0("p2_", stats_variables) 
-p2_opp_stats_variables <- paste0("p2_opp_", stats_variables)
+# Define the variables for p1 last game (at this moment we only miss the opp rep)
+p2_match_stats <- paste0("p2_", match_stats_variables) 
+p2_stats_variables <- paste0("p2_", player_stats_variables) 
+p2_opp_stats_variables <- paste0("p2_opp_", player_stats_variables)
 p2_opp_info_variables <- paste0("p2_opp_", info_variables)
-#p2_match_stats <- 
 
-#p1_rec_variables <- c(p1_stats_variables,p1_opp_stats_variables,p1_match_stats,p1_opp_info_variables)
-#p1_rec_variables <- c(p2_stats_variables,p2_opp_stats_variables,p2_match_stats,p2_opp_info_variables)
+p1_rec_variables <- c(p1_match_stats, p1_stats_variables, p1_opp_stats_variables, p1_opp_info_variables)
+p2_rec_variables <- c(p2_match_stats, p2_stats_variables, p2_opp_stats_variables, p2_opp_info_variables)
 
 match_info_variables <- c("grass", "hard", "clay", "year", "month", "day", "draw_size")
 
 
-
-
-# Let us focus on one line only!
-train_x <- data_history[1, (c(p1_info_variables, p1_rec_variables, p2_info_variables, p2_rec_variables, match_info_variables)), with = FALSE]
-train_y <- data_history[1, p1_win]
   
 # Train the model --------------------------------------------------------
 
@@ -157,6 +153,12 @@ p2_rec_output <- p2_rec_input %>%
 p1_opp_rec_input <- layer_input(shape = list(NULL,length(p1_rec_variables)))
 p1_opp_rec_output <- p1_opp_rec_input %>%  layer_gru(units = 40, return_state = TRUE)
 p1_opp_rep_state <- get_weights(p1_opp_rec_output[[2]])
+
+p1_opp_rec_output[[2]]
+
+# Let us focus on one line only!
+train_x <- data_history[1, (c(p1_info_variables, p1_rec_variables, p2_info_variables, p2_rec_variables, match_info_variables)), with = FALSE]
+train_y <- data_history[1, p1_win]
 
 #opp_rec_model <- keras_model(inputs = p1_opp_rec_input, outputs = p1_opp_rec_output[[1]])
 #p1_opp_rep <- c(p1_opp_info_input,get_wewights(opp_rec_model))
