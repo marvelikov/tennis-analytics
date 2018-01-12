@@ -54,6 +54,8 @@ m_stats <- data[seq(1,nrow(data),2), m_stats_var, with = FALSE]
 # Work on variables -------------------------------------------------------
 ###################
 
+
+
 #### player's info ####
 
 # we don't need the player's name
@@ -117,7 +119,7 @@ p_info <- one_hot(p_info, "ioc")
 
 #### player's stats ####
 
-p_stats[,ind_aband := as.numeric(ind_aband)]
+p_stats[,ind_aband := NULL]
 p_stats[,retired := as.numeric(retired)]
 
 p_stats[is.na(score_set_1),]$score_set_1 <- 0
@@ -136,8 +138,57 @@ p2_stats <- p_stats[seq(2,nrow(p_stats),2),]
 
 
 
+#### matches' info 
+
+# Keep match_id for... id purposes
+
+
+# New tourney_id
+tourney_id2 <- unlist(strsplit(x = m_info[, tourney_id], split = "-"))[seq(2,2*nrow(m_info),2)]
+# tourney_id2 from tourney_id -- removing year
+m_info[, tourney_id2 := tourney_id2]
+m_info[, tourney_id := NULL]
+
+
+# tourney_name removed -- should try long-lat
+m_info[, tourney_name := NULL]
 
 
 
+# Identify Round Robin ("RR") tourney
+RR_tourney_ids <- unique(m_info[round == "RR",]$tourney_id2)
+m_info[, RR_tourney := 0]
+m_info[tourney_id2 %in% RR_tourney_ids, RR_tourney := 1]
+
+# round, in order
+ordered_char <- c("F", "SF", "R16", "R32", "R64", "R128", "RR", "QF")
+for(i in seq_along(ordered_char)){
+  m_info[round == ordered_char[i], round_ord := i]
+}
+m_info[,round := NULL]
 
 
+# one_hot surface
+m_info[,surface := as.factor(surface)]
+m_info <- one_hot(m_info,"surface")
+
+
+# tourney_level
+# G: Grand Slam
+# M: Masters
+# F: Finals
+# A: ATP Series (250 and 500)
+# C: Challenger
+ordered_char <- c("G", "F", "M", "A", "C")
+for(i in seq_along(ordered_char)){
+  m_info[tourney_level == ordered_char[i], tourney_level_ord := i]
+}
+m_info[,tourney_level := NULL]
+
+
+# split date in three
+m_info[, tourney_date := as.Date(tourney_date)]
+m_info[, year := year(tourney_date)]
+m_info[, month := month(tourney_date)]
+m_info[, day := day(tourney_date)]
+m_info[, tourney_date := NULL]
