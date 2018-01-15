@@ -74,10 +74,11 @@ feed_input <- layer_concatenate(list(p1_info_input,p1_rec_output,p2_info_input,p
 feed_output <- feed_input %>%
   layer_dense(feed_width) %>%
   layer_dense(feed_width) %>%
-  layer_dense(feed_width/2) %>%
-  layer_dense(feed_width/2) %>%
-  layer_dense(feed_width/4) %>%
-  layer_dense(feed_width/8) %>%
+  layer_dense(floor(feed_width/2)) %>%
+  layer_dense(floor(feed_width/2)) %>%
+  layer_dense(floor(feed_width/4)) %>%
+  layer_dense(floor(feed_width/4)) %>%
+  layer_dense(floor(feed_width/8)) %>%
   layer_dense(1)
 
 
