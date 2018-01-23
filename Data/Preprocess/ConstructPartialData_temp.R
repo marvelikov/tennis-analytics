@@ -36,7 +36,7 @@ p_info_var <- c("name","id","seed","entry","hand","ht","ioc","age","rank","rank_
 m_info_var <- c("round","tourney_name","tourney_date","tourney_id","match_num","surface",
                 "draw_size","tourney_level","best_of")
 
-p_stats_var <- c("ace","df","svpt","1stIn","1stWon","2ndWon","SvGms","bpSaved","bpFaced",
+p_stats_var <- c("win","ace","df","svpt","1stIn","1stWon","2ndWon","SvGms","bpSaved","bpFaced",
              "rpt_won","rpt","ind_aband","retired","score_set_1","score_set_2","score_set_3",
              "score_set_4","score_set_5")
 m_stats_var <- c("minutes","nb_sets")
@@ -160,6 +160,8 @@ RR_tourney_ids <- unique(m_info[round == "RR",]$tourney_id2)
 m_info[, RR_tourney := 0]
 m_info[tourney_id2 %in% RR_tourney_ids, RR_tourney := 1]
 
+
+
 # round, in order
 ordered_char <- c("F", "SF", "R16", "R32", "R64", "R128", "RR", "QF")
 for(i in seq_along(ordered_char)){
@@ -192,3 +194,17 @@ m_info[, year := year(tourney_date)]
 m_info[, month := month(tourney_date)]
 m_info[, day := day(tourney_date)]
 m_info[, tourney_date := NULL]
+
+
+# match_id *MAIN ID*
+m_info[, match_id := paste(year,tourney_id2,match_num,sep="-")]
+m_info[, match_num := NULL]
+
+temp <- which(names(m_info) == "match_id")
+setcolorder(m_info, c(temp,(1:ncol(m_info))[-temp]))
+rm(temp)
+
+# Say we one_hot tourney_id2...
+m_info[, tourney_id := as.factor(tourney_id2)]
+m_info <- one_hot(m_info,"tourney_id")
+m_info[, tourney_id2 := NULL]

@@ -27,7 +27,7 @@ p_stats
 m_info
 m_stats
 
-# Do not consider the variables id for p_info and match_num for m_info
+# Do not consider the variables id for p_info, and match_id for m_info
 p_info_width <- ncol(p_info) - 1
 p_stats_width <- ncol(p_stats)
 m_info_width <- ncol(m_info) - 1
@@ -58,14 +58,16 @@ p1_rec_output <- p1_rec_input %>%
   layer_dense(units = 60) %>%
   layer_dense(units = 40) %>%
   layer_dense(units = 30) %>%
-  layer_dense(units = 20)
-  
+  layer_embedding(input_dim = 30, output_dim = 20) %>%
+  layer_gru(units = 20)
+
 p2_rec_output <- p2_rec_input %>%
   layer_dense(units = 80) %>%
   layer_dense(units = 60) %>%
   layer_dense(units = 40) %>%
   layer_dense(units = 30) %>%
-  layer_dense(units = 20)
+  layer_embedding(input_dim = 30, output_dim = 20) %>%
+  layer_gru(units = 20)
 
 
 
