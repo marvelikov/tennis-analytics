@@ -58,17 +58,22 @@ p1_rec_output <- p1_rec_input %>%
   layer_dense(units = 60) %>%
   layer_dense(units = 40) %>%
   layer_dense(units = 30) %>%
-  layer_embedding(input_dim = 30, output_dim = 20) %>%
-  layer_gru(units = 20)
+  layer_reshape(target_shape = c(1,30)) %>%
+  layer_simple_rnn(units = 20)
+
+  #layer_embedding(input_dim = 30, output_dim = 20) %>%
+  #layer_gru(units = 20)
 
 p2_rec_output <- p2_rec_input %>%
   layer_dense(units = 80) %>%
   layer_dense(units = 60) %>%
   layer_dense(units = 40) %>%
   layer_dense(units = 30) %>%
-  layer_embedding(input_dim = 30, output_dim = 20) %>%
+  layer_reshape(target_shape = c(1,30)) %>%
   layer_gru(units = 20)
 
+#layer_embedding(input_dim = 30, output_dim = 20) %>%
+#layer_gru(units = 20)
 
 
 feed_input <- layer_concatenate(list(p1_info_input,p1_rec_output,p2_info_input,p2_rec_output,match_info_input))
