@@ -206,5 +206,5 @@ rm(temp)
 
 # Say we one_hot tourney_id2...
 m_info[, tourney_id := as.factor(tourney_id2)]
-m_info <- one_hot(m_info,"tourney_id")
+m_info <- one_hot(m_info, "tourney_id")
 m_info[, tourney_id2 := NULL]

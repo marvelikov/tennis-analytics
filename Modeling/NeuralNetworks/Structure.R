@@ -34,7 +34,7 @@ m_info_width <- ncol(m_info) - 1
 m_stats_width <- ncol(m_stats)
 
 # Determine the width of the recurrent nets' output
-rec_output_width <- 30
+rec_output_width <- 20
 
 # That means the total width of the representation is
 p_rep_width <- p_info_width+rec_output_width
