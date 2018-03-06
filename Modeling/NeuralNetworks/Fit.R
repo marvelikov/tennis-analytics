@@ -43,8 +43,10 @@ m_stats[, (cols) := lapply(.SD, function(x){x/max(x)}), .SDcols=cols]
 cols <- colnames(p_info)[c(2,11,81:83)]
 p_info[, (cols) := lapply(.SD, function(x){x/max(x)}), .SDcols=cols]
 
-cols <- colnames(p_stats)[c(2:18)]
-p_stats[, (cols) := lapply(.SD, scale), .SDcols=cols]
+#cols <- colnames(p_stats)[c(2:18)]
+#p_stats[, (cols) := lapply(.SD, scale), .SDcols=cols]
+cols <- colnames(p_stats)[2:18]
+p_stats[, (cols) := lapply(.SD, function(x){x/max(x)}), .SDcols=cols]
 
 
 N <- length(unique(p_info$id))
@@ -91,14 +93,14 @@ for(i in 1:100){
   m_s <- m_stats[i,]
   
 
-  if(!(is.na(last_game_mat[p1_i$id,1]) | is.na(last_game_mat[p1_i$id,1]))){
+  if(!(is.na(last_game_mat[p1_i$id,1]))){
     p1_rec_input <- last_game_mat[p1_i$id,]
   }else{
     p1_rec_input <- c(as.matrix(m_i),as.matrix(m_s),
                       as.matrix(p1_s2),as.matrix(p2_s2),
                       as.matrix(p2_i2),rep(0,rec_output_width))
   }
-  if(!(is.na(last_game_mat[p1_i$id,1]) | is.na(last_game_mat[p1_i$id,1]))){
+  if(!(is.na(last_game_mat[p2_i$id,1]))){
     p2_rec_input <- last_game_mat[p2_i$id,]
   }else{
     p2_rec_input <- c(as.matrix(m_i),as.matrix(m_s),
