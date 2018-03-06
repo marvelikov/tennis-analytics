@@ -29,7 +29,7 @@ m_stats
 
 # Do not consider the variables id for p_info, and match_id for m_info
 p_info_width <- ncol(p_info) - 1
-p_stats_width <- ncol(p_stats)
+p_stats_width <- ncol(p_stats) - 1
 m_info_width <- ncol(m_info) - 1
 m_stats_width <- ncol(m_stats)
 
@@ -54,23 +54,23 @@ inputs <- list(p1_info_input,p1_rec_input,p2_info_input,p2_rec_input,match_info_
 
 
 p1_rec_output <- p1_rec_input %>%
-  layer_dense(units = 80) %>%
-  layer_dense(units = 60) %>%
-  layer_dense(units = 40) %>%
+  layer_dense(units = 80, activation = "relu") %>%
+  layer_dense(units = 60, activation = "relu") %>%
+  layer_dense(units = 40, activation = "relu") %>%
   layer_reshape(target_shape = c(1,40)) %>%
-  layer_gru(units = 30, return_sequence = TRUE, name = "GRU1_p1") %>%
-  layer_gru(units = 25, return_sequence = TRUE, name = "GRU2_p1") %>%
-  layer_gru(units = 20, name = "GRU3_p1")
+  layer_gru(units = 30, return_sequence = TRUE, activation = "relu", name = "GRU1_p1") %>%
+  layer_gru(units = 25, return_sequence = TRUE, activation = "relu", name = "GRU2_p1") %>%
+  layer_gru(units = 20, activation = "relu", name = "GRU3_p1")
   
 
 p2_rec_output <- p2_rec_input %>%
-  layer_dense(units = 80) %>%
-  layer_dense(units = 60) %>%
-  layer_dense(units = 40) %>%
+  layer_dense(units = 80, activation = "relu") %>%
+  layer_dense(units = 60, activation = "relu") %>%
+  layer_dense(units = 40, activation = "relu") %>%
   layer_reshape(target_shape = c(1,40)) %>%
-  layer_gru(units = 30, return_sequence = TRUE, name = "GRU1_p2") %>%
-  layer_gru(units = 25, return_sequence = TRUE, name = "GRU2_p2") %>%
-  layer_gru(units = 20, name = "GRU3_p2")
+  layer_gru(units = 30, return_sequence = TRUE, activation = "relu", name = "GRU1_p2") %>%
+  layer_gru(units = 25, return_sequence = TRUE, activation = "relu", name = "GRU2_p2") %>%
+  layer_gru(units = 20, activation = "relu", name = "GRU3_p2")
 
 
 # We want auxillary outputs!
@@ -79,21 +79,21 @@ p2_rec_output <- p2_rec_input %>%
 feed_input <- layer_concatenate(list(p1_info_input,p1_rec_output,p2_info_input,p2_rec_output,match_info_input))
 
 feed_output <- feed_input %>%
-  layer_dense(feed_width) %>%
-  layer_dense(feed_width) %>%
-  layer_dense(floor(feed_width/2)) %>%
-  layer_dense(floor(feed_width/2)) %>%
-  layer_dense(floor(feed_width/4)) %>%
-  layer_dense(floor(feed_width/4)) %>%
-  layer_dense(floor(feed_width/8)) %>%
-  layer_dense(1)
+  layer_dense(feed_width, activation = "relu") %>%
+  layer_dense(feed_width, activation = "relu") %>%
+  layer_dense(floor(feed_width/2), activation = "relu") %>%
+  layer_dense(floor(feed_width/2), activation = "relu") %>%
+  layer_dense(floor(feed_width/4), activation = "relu") %>%
+  layer_dense(floor(feed_width/4), activation = "relu") %>%
+  layer_dense(floor(feed_width/8), activation = "relu") %>%
+  layer_dense(1, activation = "sigmoid")
 
 
 model <- keras_model(inputs = inputs, outputs = feed_output)
 
 model %>% compile(
   loss = 'mean_absolute_error', # We have 0-1 classification...
-  optimizer = 'adamax', # To be investigated
-  metrics = c("categorical_accuracy")  
+  optimizer = 'adagrad', # To be investigated
+  metrics = c("binary_accuracy")  
 )
 
