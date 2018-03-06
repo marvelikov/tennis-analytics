@@ -75,13 +75,6 @@ p2_rec_output <- p2_rec_input %>%
 
 # We want auxillary outputs!
 
-p1_output <- p1_rec_output %>% 
-  layer_dense(units = 20, activation = "linear", name = 'p1_output')
-
-p2_output <- p2_rec_output %>% 
-  layer_dense(units = 20, activation = "linear" , name = 'p2_output')
-
-
 
 feed_input <- layer_concatenate(list(p1_info_input,p1_rec_output,p2_info_input,p2_rec_output,match_info_input))
 
@@ -96,11 +89,10 @@ feed_output <- feed_input %>%
   layer_dense(1)
 
 
-model <- keras_model(inputs = inputs, outputs = c(feed_output,p1_output,p2_output))
+model <- keras_model(inputs = inputs, outputs = feed_output)
 
 model %>% compile(
   loss = 'mean_absolute_error', # We have 0-1 classification...
-  loss_weights = c(1, 0, 0),
   optimizer = 'adamax', # To be investigated
   metrics = c("categorical_accuracy")  
 )

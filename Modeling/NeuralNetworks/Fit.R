@@ -11,6 +11,8 @@ m_stats
 p_info
 p_stats
 
+
+m_info[, match_id := NULL]
 p_info[, id := frank(id, ties.method = "dense")]
 
 N <- length(unique(p_info$id))
@@ -22,58 +24,76 @@ r1 <- sapply(layer_names[1:3], function(nn){
 weight_list <- replicate(N, r1)
 rm("r1")
 
-s1 <- sapply(layer_names[1:3], function(nn){
-  get_config(model$get_layer(name = nn))
-})
+
+last_game_mat <- matrix(nrow = N, ncol = rec_width)
 
 
 
-last_game_mat <- 
+#for(i in 1:nrow(m_info)){
+for(i in 1:5){
 
-
-
-for(i in 1:nrow(m_info)){
-  
   # choose which player is player 1
   who <- sample.int(2,1)
   
-  p1_i <- p_info[2*i - (who == 1),]
-  p2_i <- p_info[2*i - (who == 2),]
-  p1_s <- p_stats[2*i - (who == 1),]
-  p2_s <- p_stats[2*i - (who == 2),]
+  p1_ind <- 2*i - (who == 1)
+  p2_ind <- 2*i - (who == 2)
+  
+  p1_i <- p_info[p1_ind,]
+  p2_i <- p_info[p2_ind,]
+  p1_s <- p_stats[p1_ind,]
+  p2_s <- p_stats[p2_ind,]
   
   sapply(seq_along(layer_names), function(j){
-    set_weights(model$get_layer(name = layer_names[j]), weights = representation_list[,(j - 1) %% 3 + 1,p1_i$id])
+    print(j)
+    set_weights(model$get_layer(name = layer_names[j]), weights = weight_list[,(j - 1) %% 3 + 1,p1_i$id])
   })
+  
+  p1_i2 <- copy(p1_i)[, id := NULL]
+  p2_i2 <- copy(p2_i)[, id := NULL]
+
+  m_i <- m_info[i,]
+  m_s <- m_stats[i,]
+  
+
+  if(!(is.na(last_game_mat[p1_i$id,1]) | is.na(last_game_mat[p1_i$id,1]))){
+    p1_rec_input <- last_game_mat[p1_i$id,]
+    p2_rec_input <- last_game_mat[p2_i$id,]
+  }else{
+    p1_rec_input <- c(as.matrix(m_i),as.matrix(m_s),
+                      as.matrix(p1_s),as.matrix(p2_s),
+                      as.matrix(p2_i2),rep(0,rec_output_width))
+    p2_rec_input <- c(as.matrix(m_i),as.matrix(m_s),
+                      as.matrix(p2_s),as.matrix(p1_s),
+                      as.matrix(p1_i2),rep(0,rec_output_width))
+  }
+  
+  data_input <- list(as.matrix(p1_i2), matrix(p1_rec_input,nrow=1), as.matrix(p2_i2), matrix(p2_rec_input,nrow=1),matrix(m_info2,nrow=1))
+  model %>% fit(x = data_input, y = as.numeric(who == 1), batch_size = 1 , epochs = 1)
+    
 
 
+  gru_p1_model <- keras_model(inputs = model$input, outputs = get_layer(model, "GRU3_p1")$output)
+  gru_p2_model <- keras_model(inputs = model$input, outputs = get_layer(model, "GRU3_p2")$output)
+  gru_p1_output <- predict(gru_p1_model, data_input)
+  gru_p2_output <- predict(gru_p2_model, data_input)
+
   
-  
-  
+  last_game_mat[p1_i$id,] <- c(as.matrix(m_i),as.matrix(m_s),
+                    as.matrix(p1_s),as.matrix(p2_s),
+                    as.matrix(p2_i2),gru_p1_output)
+  last_game_mat[p2_i$id,] <- c(as.matrix(m_i),as.matrix(m_s),
+                    as.matrix(p2_s),as.matrix(p1_s),
+                    as.matrix(p1_i2),gru_p2_output)
   
 
-  # Need modif....
-  model %>% fit(x = list(p1_i2,matrix(p1_rec_input, nrow = 1),p2_i2,matrix(p2_rec_input, nrow = 1),matrix(m_info2, nrow = 1)), y = 1, batch_size = 1 , epochs = 1)
-  
-  
-  
-  # Store this game's stats NEED TO GET THE OUTPUT AT THE GRU LAYER!!!
-  #last_game_mat[,p1_i$id] <- c(m_i,m_s,p1_s,p2_s,p2_i,  **GRU-OUT-p2**  )
-  #last_game_mat[,p2_i$id] <- c(m_i,m_s,p2_s,p1_s,p1_i,  **GRU-OUT-p1**  )
-  
-  
   # Update representations
-  representation_list[[p1_i$id]] <- sapply(layer_names[1:3], function(nn){
+  weight_list[[p1_i$id]] <- sapply(layer_names[1:3], function(nn){
     get_weights(model$get_layer(name = nn))
   })
   
-  representation_list[[p2_i$id]] <- sapply(layer_names[4:6], function(nn){
+  weight_list[[p2_i$id]] <- sapply(layer_names[4:6], function(nn){
     get_weights(model$get_layer(name = nn))
   })
-  
-  c(as.matrix(m_info[ceiling(p1_last_row/2),-1]),as.matrix(m_stats[ceiling(p1_last_row/2),]),
-    as.matrix(p_stats[p1_last_row,]),as.matrix(p_stats[p1_opp_row,]),
-    as.matrix(p_info[p1_opp_row,-1]),p1_opp_net_out)
   
 }
 
