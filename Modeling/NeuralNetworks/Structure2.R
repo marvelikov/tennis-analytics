@@ -56,12 +56,6 @@ inputs <- list(p1_info_input,p1_rec_input,p2_info_input,p2_rec_input,match_info_
 
 
 p1_rec_output <- p1_rec_input %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
   layer_dense(units = 80, activation = "relu", name = "p1_l1") %>%
   layer_dense(units = 60, activation = "relu", name = "p1_l2") %>%
   layer_dense(units = 40, activation = "relu", name = "p1_l3") %>%
@@ -69,34 +63,17 @@ p1_rec_output <- p1_rec_input %>%
   layer_dense(units = 20, activation = "relu", name = "p1_l5")
 
 p2_rec_output <- p2_rec_input %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
-  layer_dense(units = 80, activation = "relu") %>%
   layer_dense(units = 80, activation = "relu", name = "p2_l1") %>%
   layer_dense(units = 60, activation = "relu", name = "p2_l2") %>%
   layer_dense(units = 40, activation = "relu", name = "p2_l3") %>%
   layer_dense(units = 20, activation = "relu", name = "p2_l4") %>%
   layer_dense(units = 20, activation = "relu", name = "p2_l5")
 
-# We want auxillary outputs!
 
 
 feed_input <- layer_concatenate(list(p1_info_input,p1_rec_output,p2_info_input,p2_rec_output,match_info_input))
 
 feed_output <- feed_input %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
-  layer_dense(feed_width, activation = "relu") %>%
   layer_dense(feed_width, activation = "relu") %>%
   layer_dense(feed_width, activation = "relu") %>%
   layer_dense(feed_width, activation = "relu") %>%
