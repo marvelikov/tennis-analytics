@@ -36,21 +36,21 @@ import_time <- Sys.time()
 source("Data/R/GameByGame/TransformData.R")
 fwrite(data_transformed, "Data/Cleaned/DataTransformed.csv")
 transform_time <- Sys.time()
-
-# Summarise data
-source("Data/R/GameByGame/SummariseData.R")
-split_data_git(data = data_summarised, split_into = split_data_into, filename = "Data/Cleaned/DataSummarised")
-summarise_time <- Sys.time()
-
-# Create variables
-source("Data/R/GameByGame/CreateVariablesData.R")
-split_data_git(data = data_pre_modeling, split_into = split_data_into, filename = "Data/Cleaned/DataPreModeling")
-variables_time <- Sys.time()
-
-# Structure data for modeling
-source("Data/R/GameByGame/ModelingData.R")
-fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
-modeling_time <- Sys.time()
+# 
+# # Summarise data
+# source("Data/R/GameByGame/SummariseData.R")
+# split_data_git(data = data_summarised, split_into = split_data_into, filename = "Data/Cleaned/DataSummarised")
+# summarise_time <- Sys.time()
+# 
+# # Create variables
+# source("Data/R/GameByGame/CreateVariablesData.R")
+# split_data_git(data = data_pre_modeling, split_into = split_data_into, filename = "Data/Cleaned/DataPreModeling")
+# variables_time <- Sys.time()
+# 
+# # Structure data for modeling
+# source("Data/R/GameByGame/ModelingData.R")
+# fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
+# modeling_time <- Sys.time()
 
 # Summary of execution time
 int <- list(start_time, import_time, transform_time, summarise_time, variables_time, modeling_time)
