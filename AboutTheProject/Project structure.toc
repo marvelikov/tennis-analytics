@@ -1,6 +1,0 @@
-\select@language {french}
-\contentsline {section}{\numberline {1}Base de donn\IeC {\'e}es}{3}
-\contentsline {subsection}{\numberline {1.1}Collecte}{3}
-\contentsline {section}{\numberline {2}Mod\IeC {\'e}lisation}{3}
-\contentsline {subsection}{\numberline {2.1}R\IeC {\'e}gression logistique}{3}
-\contentsline {subsection}{\numberline {2.2}R\IeC {\'e}seau de neurones}{3}
