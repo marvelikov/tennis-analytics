@@ -21,7 +21,7 @@ library(keras)
 
 # Our data blocks are
 
-source("Data/Preprocess/ConstructPartialData_temp.R")
+source("Data/R/GameByGame/scripts/ConstructPartialData_temp.R")
 p_info
 p_stats
 m_info
