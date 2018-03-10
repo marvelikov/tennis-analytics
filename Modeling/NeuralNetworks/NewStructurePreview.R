@@ -59,7 +59,7 @@ model <- keras_model(inputs = inputs, outputs = feed_output)
 
 # We begin by train only one iteration
 # Load data in the environment
-source("Data/Preprocess/ConstructPartialData.R")
+source("Data/R/GameByGame/scripts/ConstructDataNN.R")
 
 # Define response variable
 data_history[, p1_win := 1]
