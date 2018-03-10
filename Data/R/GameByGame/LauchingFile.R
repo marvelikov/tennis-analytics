@@ -10,7 +10,7 @@
 start_year <- 2010
 end_year <- 2016
 split_data_into <- 4
-source("Data/R/ImportSplittedData.R")
+source("Data/R/GameByGame/scripts/ImportSplittedData.R")
 
 
 # Run needed scripts ------------------------------------------------------
@@ -27,30 +27,30 @@ split_data_git <- function(data, split_into, filename) {
 
 start_time <- Sys.time()
 # Import data
-source("Data/R/GameByGame/ImportData.R")
+source("Data/R/GameByGame/scripts/ImportData.R")
 data_raw <- import_games(year_from = start_year, year_to = end_year)
-fwrite(data_raw, "Data/Raw/DataRawGameByGame.csv")
+fwrite(data_raw, "Data/Cleaned/DataRawGameByGame.csv")
 import_time <- Sys.time()
 
 # Transform data
 source("Data/R/GameByGame/TransformData.R")
 fwrite(data_transformed, "Data/Cleaned/DataTransformed.csv")
 transform_time <- Sys.time()
-# 
-# # Summarise data
-# source("Data/R/GameByGame/SummariseData.R")
-# split_data_git(data = data_summarised, split_into = split_data_into, filename = "Data/Cleaned/DataSummarised")
-# summarise_time <- Sys.time()
-# 
-# # Create variables
-# source("Data/R/GameByGame/CreateVariablesData.R")
-# split_data_git(data = data_pre_modeling, split_into = split_data_into, filename = "Data/Cleaned/DataPreModeling")
-# variables_time <- Sys.time()
-# 
-# # Structure data for modeling
-# source("Data/R/GameByGame/ModelingData.R")
-# fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
-# modeling_time <- Sys.time()
+
+# Summarise data
+source("Data/R/GameByGame/scripts/SummariseData.R")
+split_data_git(data = data_summarised, split_into = split_data_into, filename = "Data/Cleaned/DataSummarised")
+summarise_time <- Sys.time()
+
+# Create variables
+source("Data/R/GameByGame/scripts/CreateVariablesData.R")
+split_data_git(data = data_pre_modeling, split_into = split_data_into, filename = "Data/Cleaned/DataPreModeling")
+variables_time <- Sys.time()
+
+# Structure data for modeling
+source("Data/R/GameByGame/scripts/ModelingData.R")
+fwrite(data_modeling, "Data/Cleaned/DataModeling.csv")
+modeling_time <- Sys.time()
 
 # Summary of execution time
 int <- list(start_time, import_time, transform_time, summarise_time, variables_time, modeling_time)

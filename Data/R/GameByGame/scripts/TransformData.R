@@ -21,7 +21,7 @@ library(dplyr)
 
 # Import raw data ---------------------------------------------------------
 
-data_raw <- fread("Data/Raw/DataRawGameByGame.csv")
+data_raw <- fread("Data/Cleaned/DataRawGameByGame.csv")
 data_transformed <- data_raw[-grep(pattern = "Davis", x = data_raw$tourney_name),]
 data_transformed <- data_transformed[-grep(pattern = "Olympics", x = data_transformed$tourney_name),]
 data_transformed$tourney_date <- ymd(data_transformed$tourney_date)

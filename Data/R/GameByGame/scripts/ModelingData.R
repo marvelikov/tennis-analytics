@@ -111,7 +111,7 @@ new_names <- gsub("l_", "p2_", new_names)
 colnames(data_modeling) <- new_names
 
 # Swap the columns
-source("Data/R/GameByGame/SwapColumns.R")
+source("Data/R/GameByGame/scripts/SwapColumns.R")
 data_modeling <- swap_cols(data_modeling) %>% select(-tourney_name)
 
 
