@@ -133,7 +133,7 @@ trails_stats <- sapply(1:max(p_info$id), function(the_id){
 
 # number of timesteps for the two different kind of streams we have 
 
-n_timesteps <- 15
+n_timesteps <- 3
 
 
 
@@ -149,36 +149,75 @@ shifted_trails <- sapply(1:length(trails_stats), function(i){
 
 # This constructs the appropriate data sequences
 my_env <- environment()
-response_mat <- matrix(nrow = nrow(p_info), ncol = ncol(m_s_mat)+2*ncol(p_s_mat))
+response_mat1 <- matrix(0,nrow = nrow(m_i_mat), ncol = n_timesteps*(ncol(m_s_mat)+2*ncol(p_s_mat)))
+response_mat2 <- matrix(0,nrow = nrow(m_i_mat), ncol = n_timesteps*(ncol(m_s_mat)+2*ncol(p_s_mat)))
+safety_mat <- matrix(nrow = nrow(m_i_mat), ncol = ncol(m_s_mat)+2*ncol(p_s_mat))
+
+p1_win <- sample(0:1, nrow(m_i_mat), replace = TRUE)
 
 
 
-data_mat <- t(sapply(1:nrow(p_i_mat), function(i){
+data_mat1 <- t(sapply(2* 1:nrow(m_i_mat), function(i){
   
   if(i %% 200 == 0){
     print(i)
   }
   
-  the_id <- p_i_mat[i,1]
+  the_id <- p_i_mat[i - p1_win[ceiling(i/2)],1]
   
   trail <- row_id_trails[[the_id]]
-  the_rows <- which(trail >= i)
+  the_rows <- which(trail >= i - p1_win[ceiling(i/2)])
   
   trail2 <- unlist(sapply(trail, function(j){
     j+1-2*(j %% 2 == 0)
   }))
   
+  r_mat <- shifted_trails[[the_id]][the_rows[min(length(the_rows),n_timesteps):1],-(1:ncol(trails_info[[1]]))]
+  my_env$response_mat1[ceiling(i/2),(1 + (ncol(my_env$response_mat1) - length(c(t(r_mat))))):ncol(my_env$response_mat1)] <- c(t(r_mat))
 
-  my_env$response_mat[i,] <- shifted_trails[[the_id]][the_rows[1],-(1:ncol(trails_info[[1]]))]
-  
-  mat <- matrix(-1.0, nrow = n_timesteps, ncol = ncol(shifted_trails[[1]]))
+  mat <- matrix(0, nrow = n_timesteps, ncol = ncol(shifted_trails[[1]]))
   
   mat[n_timesteps:(n_timesteps-min(length(the_rows),n_timesteps)+1),] <- shifted_trails[[the_id]][the_rows[1:min(length(the_rows),n_timesteps)]+1,]
+  
+  my_env$safety_mat[ceiling(i/2),] <- mat[n_timesteps,-(1:ncol(trails_info[[1]]))]
+  
   c(t(mat))
 }))
 
+rbind(safety_mat[10,-(1:2)][1:18],response_mat[10,-(1:2)][19:36])
 
-dim(data_mat)
+
+data_mat2 <- t(sapply(2* 1:nrow(m_i_mat), function(i){
+  
+  if(i %% 200 == 0){
+    print(i)
+  }
+  
+  the_id <- p_i_mat[i + p1_win[ceiling(i/2)] - 1,1]
+  
+  trail <- row_id_trails[[the_id]]
+  the_rows <-which(trail >= i + p1_win[ceiling(i/2)] - 1)
+  
+  trail2 <- unlist(sapply(trail, function(j){
+    j+1-2*(j %% 2 == 0)
+  }))
+
+  r_mat <- shifted_trails[[the_id]][the_rows[min(length(the_rows),n_timesteps):1],-(1:ncol(trails_info[[1]]))]
+  my_env$response_mat2[ceiling(i/2),(1 + (ncol(my_env$response_mat2) - length(c(t(r_mat))))):ncol(my_env$response_mat2)] <- c(t(r_mat))
+  
+  mat <- matrix(0, nrow = n_timesteps, ncol = ncol(shifted_trails[[1]]))
+  
+  mat[n_timesteps:(n_timesteps-min(length(the_rows),n_timesteps)+1),] <- shifted_trails[[the_id]][the_rows[1:min(length(the_rows),n_timesteps)]+1,]
+  
+  my_env$safety_mat[ceiling(i/2),] <- mat[n_timesteps,-(1:ncol(trails_info[[1]]))]
+  
+  c(t(mat))
+}))
+
+rbind(safety_mat[10,-(1:2)][1:18],response_mat[10,-(1:2)][19:36])
+rbind(safety_mat[10,-(1:2)][1:18],response_mat[10,-(1:2)][1:18])
+
+dim(data_mat1)
 
 # construct responses
 
@@ -193,68 +232,59 @@ response_stats <- response_mat[,-c(3,21,16:20,34:38)]
 
 # construct input layers
 
-input_lstm <- layer_input(shape=list(n_timesteps*n_inputs_lstm), name = "input_lstm")
+input_lstm1 <- layer_input(shape=list(n_timesteps*n_inputs_lstm), name = "input_lstm")
+input_lstm2 <- layer_input(shape=list(n_timesteps*n_inputs_lstm), name = "input_lstm")
 
 
 # construct the lstms
 
-output_lstm <- input_lstm %>% 
+output_lstm1 <- input_lstm1 %>% 
   layer_reshape(target_shape = c(n_timesteps, n_inputs_lstm)) %>%
-  layer_masking(mask_value = -1.0) %>%
-  #layer_gru(units = 2*n_inputs_lstm, dropout = .4, recurrent_dropout =  .1, return_sequences = TRUE) %>%
-  layer_gru(units = 2*n_inputs_lstm, dropout = .2, recurrent_dropout =  .1, return_sequences = TRUE, recurrent_regularizer = regularizer_l1_l2()) %>%
-  #layer_gru(units = 5*n_inputs_lstm, dropout = .4, recurrent_dropout =  .1, return_sequences = TRUE, go_backwards = TRUE) %>%
-  #layer_gru(units = n_inputs_lstm, dropout = .1, return_sequences = TRUE) %>%
-  #layer_gru(units = ceiling(n_inputs_lstm/2), dropout = .1, return_sequences = TRUE) %>%
-  layer_gru(units = 2*n_inputs_lstm, dropout = .2, name = "output_lstm", recurrent_regularizer = regularizer_l1_l2())
+  layer_masking(mask_value = 0) %>%
+  #layer_gru(units = 3*n_inputs_lstm, dropout = .4, recurrent_dropout =  .1, return_sequences = TRUE, recurrent_regularizer = regularizer_l1_l2(l1 = .2)) %>%
+  #layer_gru(units = 3*n_inputs_lstm, dropout = .4, recurrent_dropout =  .1, return_sequences = TRUE, recurrent_regularizer = regularizer_l1_l2(l1 = .2)) %>%
+  layer_gru(units = n_inputs_lstm, dropout = .1, return_sequences = TRUE) %>%
+  layer_gru(units = ncol(response_mat1)/n_timesteps, return_sequences = TRUE) %>%
+  layer_lambda(function(x){x}) %>%
+  layer_reshape(target_shape = ncol(response_mat1))
   
-output_ff <- output_lstm %>% 
-  layer_dense(ceiling(2*n_inputs_lstm), activation = "tanh") %>%
-  layer_dropout(rate = .1) %>%
-  layer_dense(ceiling(n_inputs_lstm/2), activation = "tanh", name = "output_ff") 
+output_lstm2 <- input_lstm1 %>% 
+  layer_reshape(target_shape = c(n_timesteps, n_inputs_lstm)) %>%
+  layer_masking(mask_value = -1) %>%
+  #layer_gru(units = 3*n_inputs_lstm, dropout = .4, recurrent_dropout =  .1, return_sequences = TRUE, recurrent_regularizer = regularizer_l1_l2(l1 = .2)) %>%
+  #layer_gru(units = 3*n_inputs_lstm, dropout = .4, recurrent_dropout =  .1, return_sequences = TRUE, recurrent_regularizer = regularizer_l1_l2(l1 = .2)) %>%
+  layer_gru(units = n_inputs_lstm, dropout = .1, return_sequences = TRUE) %>%
+  layer_gru(units = n_inputs_lstm, return_sequences = TRUE) %>%
+  layer_reshape(target_shape = n_timesteps*n_inputs_lstm)
 
-output_win <- output_ff %>%
-  #layer_dense(n_outputs_win, activation = "sigmoid") %>%
-  layer_dense(n_outputs_win, activation = "sigmoid") %>%
-  layer_dense(n_outputs_win, activation = "softmax", name = "output_win")
-
-output_scores <- output_ff %>%
-  #layer_dense(n_outputs_scores, activation = "sigmoid") %>%
-  layer_dropout(rate = .05) %>%
-  layer_dense(n_outputs_scores, activation = "sigmoid") %>%
-  layer_dense(n_outputs_scores, activation = "sigmoid", name = "output_scores")
-
-output_stats <- output_ff %>%
-  #layer_dense(n_outputs_stats, activation = "sigmoid") %>%
-  layer_dropout(rate = .05) %>%
-  layer_dense(n_outputs_stats, activation = "sigmoid") %>%
-  layer_dense(n_outputs_stats, activation = "sigmoid", name = "output_stats")
 
 
 
 
 
 #model <- keras_model(inputs = list(input_now,input_lstm1,input_lstm2,input_lstm3), outputs = list(output_win,output_scores,output_stats))
-model <- keras_model(inputs = list(input_lstm), outputs = list(output_win,output_scores,output_stats))
+model <- keras_model(inputs = list(input_lstm1), outputs = list(output_lstm1))
 model %>% compile(
-  loss = c("mse",'mse','mse'), # We have 0-1 classification...
-  loss_weights = c(10,1,1),
-  optimizer = 'rmsprop', # To be investigated
+  loss = c('mse'), # We have 0-1 classification...
+  optimizer = 'adam', # To be investigated
   #metrics = c("binary_accuracy")  
-  metrics = "binary_accuracy"  
+  metrics = "mse"  
 )
-predict(model, list(data_mat[1:2,]))
+#predict(model, list(data_mat1[1:2,]))
 #model %>% fit(x = list(data_now, data_trail_p1, data_trail_p2, data_trail_past), y = list(response_win,response_scores,response_stats), batch_size = 512, epochs = 3, validation_split = .05)
 
-split <- sample(nrow(data_mat),300)
-data_val <- data_mat[split,]
-data_train <- data_mat[-split,]
+#split <- sample(nrow(data_mat1),300)
+split <- nrow(data_mat1) + (-499:0)
+#data_val <- rbind(data_mat1[split,],data_mat2[split,])
+#data_train <- rbind(data_mat1[-split,],data_mat2[-split,])
 
-response_val <- list(response_win[split,],response_scores[split,],response_stats[split,])
-response_train <- list(response_win[-split,],response_scores[-split,],response_stats[-split,])
+#response_val <- rbind(response_mat1[split,],response_mat2[split,])
+#response_train <- rbind(response_mat1[-split,],response_mat2[-split,])
 
-model %>% fit(x = data_train, y = response_train, batch_size = 256, epochs = 10, validation_split = .05, view_metrics = FALSE)
+for(i in 1:10){
+  model %>% fit(x = rbind(data_mat1[-split,],data_mat2[-split,]), y = rbind(response_mat1[-split,],response_mat2[-split,]), batch_size = 256, epochs = 1, validation_split = .05, view_metrics = FALSE)
+  preds <- predict(model, rbind(data_mat1[split,],data_mat2[split,]))
+  print(mean(round(preds[,((n_timesteps - 1)* ncol(response_mat1)/n_timesteps+3)]) == rbind(data_mat1[split,],data_mat2[split,])[,((n_timesteps - 1)* ncol(response_mat1)/n_timesteps+3)]))
+}
 
 
-preds <- predict(model, data_val)[[1]]
-mean(round(preds[,1]) == response_val[[1]][,1])
