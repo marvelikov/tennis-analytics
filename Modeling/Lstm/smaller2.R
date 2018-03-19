@@ -168,7 +168,7 @@ data_mat <- t(sapply(1:nrow(p_i_mat), function(i){
     j+1-2*(j %% 2 == 0)
   }))
   
-
+  
   my_env$response_mat[i,] <- shifted_trails[[the_id]][the_rows[1],-(1:ncol(trails_info[[1]]))]
   
   mat <- matrix(-1.0, nrow = n_timesteps, ncol = ncol(shifted_trails[[1]]))
@@ -193,76 +193,118 @@ response_stats <- response_mat[,-c(3,21,16:20,34:38)]
 
 # construct input layers
 
-input_lstm <- layer_input(shape=list(n_timesteps*n_inputs_lstm), name = "input_lstm")
+input1 <- layer_input(shape=list((ncol(m_i_mat) + 2*ncol(p_i_mat) - 2)))
+input2 <- layer_input(shape=list(n_timesteps*n_inputs_lstm))
 
 
 
 # construct the lstms
 
-d_rate <- .05
+d_rate <- .15
 
-output_lstm <- input_lstm %>% 
+ff1 <- input2 %>% 
   layer_reshape(target_shape = c(n_timesteps, n_inputs_lstm)) %>%
   layer_masking(mask_value = -1.0) %>%
-  #layer_dense(ceiling(n_inputs_lstm/5), activation = "relu") %>%
-  #layer_dropout(rate = d_rate) %>%
-  layer_dense(ceiling(n_inputs_lstm/10), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs_lstm/15), activation = "relu") %>%
   layer_dropout(rate = d_rate*2) %>%
   layer_dense(ceiling(n_inputs_lstm/15), activation = "relu") %>%
   layer_dropout(rate = d_rate) %>%
-  #layer_dense(ceiling(n_inputs_lstm/10), activation = "relu") %>%
-  #layer_dropout(rate = d_rate) %>%
-  layer_batch_normalization() %>%
-  layer_gru(units = ceiling(n_inputs_lstm/20), activation = "relu")#, return_sequences = TRUE) %>%
+  layer_dense(ceiling(n_inputs_lstm/15), activation = "relu") %>%
+  layer_batch_normalization()
 
-output_ff <- output_lstm %>% 
-  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
-  layer_batch_normalization(name = "output_ff")
-  
-output_win <- output_ff %>%
-  #layer_dense(n_outputs_win, activation = "sigmoid") %>%
-  layer_dense(n_outputs_win, activation = "sigmoid") %>%
-  layer_dense(n_outputs_win, activation = "softmax", name = "output_win")
+gru1 <- ff1 %>%
+  layer_gru(units = ceiling(n_inputs_lstm/15), activation = "relu", return_sequences = TRUE) %>%
+  layer_batch_normalization()
 
-output_scores <- output_ff %>%
-  #layer_dense(n_outputs_scores, activation = "sigmoid") %>%
-  layer_dense(n_outputs_scores, activation = "relu") %>%
+ff2 <- gru1 %>%
+  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
+  layer_dropout(rate = d_rate/2) %>%
+  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
+  layer_dropout(rate = d_rate/2) %>%
+  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
+  layer_dropout(rate = d_rate/2) %>%
+  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
+  layer_batch_normalization()
+
+gru2 <- layer_concatenate(list(ff1,ff2)) %>%
+  layer_gru(units = ceiling(n_inputs_lstm/15), activation = "relu", dropout = d_rate/2, return_sequences = TRUE) %>%
+  layer_batch_normalization()
+
+ff3 <- layer_concatenate(list(gru1,gru2))  %>% 
+  layer_dense(ceiling(n_inputs_lstm/15), activation = "relu") %>%
+  layer_dropout(rate = d_rate/4) %>%
+  layer_dense(ceiling(n_inputs_lstm/15), activation = "relu") %>%
+  layer_dropout(rate = d_rate/4) %>%
+  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
+  layer_dropout(rate = d_rate/4) %>%
+  layer_dense(ceiling(n_inputs_lstm/20), activation = "relu") %>%
+  layer_batch_normalization()
+
+gru3 <- layer_concatenate(list(ff2,ff3))  %>% 
+  layer_gru(units = ceiling(n_inputs_lstm/15), activation = "relu", dropout = d_rate/4) %>%
+  layer_batch_normalization()
+
+ff4 <- layer_concatenate(list(input1,gru3)) %>%
+  layer_dense(ceiling(n_inputs_lstm/5), activation = "relu") %>%
+  layer_dropout(rate = d_rate/4) %>%
+  layer_dense(ceiling(n_inputs_lstm/5), activation = "relu") %>%
+  layer_dropout(rate = d_rate/4) %>%
+  layer_dense(ceiling(n_inputs_lstm/5), activation = "relu") %>%
+  layer_dropout(rate = d_rate/4) %>%
+  layer_dense(ceiling(n_inputs_lstm/5), activation = "relu") %>%
+  layer_batch_normalization()
+
+
+output_stats <- layer_concatenate(list(ff3,ff4)) %>%
+  layer_dense(ceiling(n_inputs_lstm/10), activation = "sigmoid") %>%
+  layer_dense(ceiling(n_inputs_lstm/10), activation = "sigmoid") %>%
+  layer_dense(n_outputs_stats, activation = "sigmoid") %>%
+  layer_dense(n_outputs_stats, activation = "relu", name = "output_stats")
+
+
+output_scores <- output_stats %>%
+  layer_dense(n_outputs_stats, activation = "sigmoid") %>%
+  layer_dense(n_outputs_scores, activation = "sigmoid") %>%
   layer_dense(n_outputs_scores, activation = "relu", name = "output_scores")
 
-output_stats <- output_ff %>%
-  #layer_dense(n_outputs_stats, activation = "sigmoid") %>%
-  layer_dense(n_outputs_stats, activation = "relu") %>%
-  layer_dense(n_outputs_stats, activation = "relu", name = "output_stats")
+
+output_win <- layer_concatenate(list(ff4,output_stats,output_scores)) %>%
+  layer_dense(ceiling(n_inputs_lstm/10), activation = "sigmoid") %>%
+  layer_dense(n_outputs_scores, activation = "sigmoid") %>%
+  layer_dense(n_outputs_win, activation = "softmax", name = "output_win")
+
+
 
 
 
 
 
 #model <- keras_model(inputs = list(input_now,input_lstm1,input_lstm2,input_lstm3), outputs = list(output_win,output_scores,output_stats))
-model <- keras_model(inputs = list(input_lstm), outputs = list(output_win,output_scores,output_stats))
+model <- keras_model(inputs = list(input1,input2), outputs = list(output_stats,output_scores,output_win))
 model %>% compile(
-  loss = c("mse",'mse','mse'), # We have 0-1 classification...
-  loss_weights = c(10,.01,.01),
-  optimizer = 'rmsprop', # To be investigated
-  #metrics = c("binary_accuracy")  
-  metrics = "binary_accuracy"  
+  loss = c('mse','mse',"binary_crossentropy"), # We have 0-1 classification...
+  loss_weights = c(1,1,1),
+  optimizer = 'adam', # To be investigated
+  metrics = c("binary_accuracy")  
+  #metrics = c("mse") 
+  #metrics = c("mse","binary_accuracy") 
 )
-predict(model, list(data_mat[1:2,]))
 
 #split <- sample(nrow(data_mat),300)
 #split <- numeric(0)
 #data_val <- data_mat[split,]
-data_train <- data_mat
+data1_train <- data_mat[,ncol(data_mat) - (n_inputs_lstm-1):0][,1:(ncol(m_i_mat) + 2*ncol(p_i_mat) - 2)]
+data2_train <- data_mat
+
+predict(model, list(data1_train[1:2,],data2_train[1:2,]))
 
 #response_val <- list(response_win[split,],response_scores[split,],response_stats[split,])
 #response_train <- list(response_win[-split,],response_scores[-split,],response_stats[-split,])
-response_train <- list(response_win,response_scores,response_stats)
+response_train <- list(response_stats,response_scores,response_win)
 
 #set_weights(model, weights)
 
-model %>% fit(x = data_train, y = response_train, batch_size = 256, epochs = 2, validation_split = .05, view_metrics = FALSE)
+model %>% fit(x = list(data1_train,data2_train), y = response_train, batch_size = 256, epochs = 200, validation_split = .05, view_metrics = FALSE)
 
 weights <- get_weights(model)
 
