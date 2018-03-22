@@ -38,6 +38,14 @@ any(is.na(p_info))
 
 
 
+# First remove all abandoned matches
+ind <- which(p_stats$retired == 1)
+
+p_stats <- p_stats[-c(ind,ind-1),]
+p_info <- p_info[-c(ind, ind-1),]
+m_stats <- m_stats[-ind/2,]
+m_info <- m_info[-ind/2,]
+
 ## p_info
 na_ind <- which(rowSums(is.na(p_info)) > 0)
 p_info[na_ind]
@@ -68,17 +76,43 @@ p_info[na_ind]
 
 
 
+any(is.na(m_stats))
+any(is.na(p_stats))
+any(is.na(p_info))
 
-# For the rest, it is mostly games that were abandoned.
+
+colSums(is.na(p_stats))
+colSums(is.na(p_info))
+
+na_ind <- which(is.na(p_stats$ace))
+p_stats <- p_stats[-na_ind,]
+p_info <- p_info[-na_ind,]
+m_stats <- m_stats[-unique(ceiling(na_ind/2)),]
+m_info <- m_info[-unique(ceiling(na_ind/2)),]
+
+
+
+
+
+any(is.na(m_stats))
+any(is.na(p_stats))
+any(is.na(p_info))
+any(is.na(p_stats))
+
+colSums(is.na(m_stats))
+mean_minutes <- round(mean(m_stats$minutes, na.rm = TRUE))
+m_stats[which(is.na(minutes)), minutes := mean_minutes]
+
+
 
 # Thanks to Matt Dowle https://stackoverflow.com/questions/7235657/fastest-way-to-replace-nas-in-a-large-data-table
-f_dowle3 = function(DT) {
-  for (j in seq_len(ncol(DT)))
-    set(DT,which(is.na(DT[[j]])),j,0)
-}
-
-f_dowle3(m_stats)
-f_dowle3(p_stats)
+# f_dowle3 = function(DT) {
+#   for (j in seq_len(ncol(DT)))
+#     set(DT,which(is.na(DT[[j]])),j,0)
+# }
+# 
+# f_dowle3(m_stats)
+# f_dowle3(p_stats)
 
 
 
@@ -206,10 +240,12 @@ input_match <- layer_input(shape=c(ncol(m_info)))
 
 
 
+# Maybe should use create_layer() to wrap some of these?
+
 reshape <- layer_reshape(target_shape = c(n_timesteps, n_inputs))
-shared_ff1 <- layer_dense(units = ceiling(n_inputs/2), activation = "relu")
-shared_ff2 <- layer_dense(units = ceiling(n_inputs/3), activation = "relu")
-shared_ff3 <- layer_dense(units = ceiling(n_inputs/6), activation = "relu")
+shared_ff1 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
+shared_ff2 <- layer_dense(units = ceiling(n_inputs/2), activation = "relu")
+shared_ff3 <- layer_dense(units = ceiling(n_inputs/3), activation = "relu")
 shared_ff4 <- layer_dense(units = ceiling(n_inputs/6), activation = "relu", input_shape = c(35))
 shared_ff5 <- layer_dense(units = ceiling(n_inputs/8), activation = "relu", input_shape = c(35))
 shared_ff6 <- layer_dense(units = ceiling(n_inputs/8), activation = "relu", input_shape = c(35))
@@ -230,23 +266,28 @@ block1_p2 <- input_p2 %>%
   shared_ff1 %>% layer_dropout(.1) %>% shared_ff2 %>% shared_ff3 %>%
   layer_batch_normalization() %>% gru1
 
-
-block2_p1 <- block1_p1 %>%  layer_batch_normalization() %>% #shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% 
+block2_p1 <- block1_p1 %>%  layer_batch_normalization() %>%
+  shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% 
+  layer_batch_normalization() %>%
   gru2
-block2_p2 <- block1_p2 %>%  layer_batch_normalization() %>% #shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% 
+block2_p2 <- block1_p2 %>%  layer_batch_normalization() %>%
+  shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% 
+  layer_batch_normalization() %>%
   gru2
 
 
-ff7 <- layer_concatenate(list(input_match ,layer_subtract(list(block2_p1,block2_p2)))) %>%
+ff7 <- layer_concatenate(list(input_match, layer_subtract(list(block2_p1,block2_p2)))) %>%
   layer_batch_normalization() %>%
   layer_dense(ceiling(n_inputs/8), activation = "relu") %>%
   layer_dropout(.1) %>%
   layer_dense(ceiling(n_inputs/8), activation = "relu") %>%
   layer_dropout(.1) %>%
-  layer_dense(ceiling(n_inputs/8), activation = "relu")
-
+  layer_dense(ceiling(n_inputs/8), activation = "relu") %>%
+  layer_batch_normalization()
+  
 
 output_stats <- ff7 %>%
+  layer_dense(ceiling(n_inputs/10), activation = "relu") %>%
   layer_dense(ceiling(n_inputs/10), activation = "relu") %>%
   layer_dense(n_outputs_stats, activation = "relu", name = "output_stats")
 
@@ -254,9 +295,9 @@ output_scores <- layer_concatenate(list(ff7,output_stats)) %>%
   layer_dense(ceiling(n_inputs/15), activation = "relu") %>%
   layer_dense(n_outputs_scores, activation = "relu", name = "output_scores")
 
-output_win <- layer_concatenate(list(output_stats,output_scores)) %>%
-  layer_dense(ceiling(n_inputs/15), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/15), activation = "relu") %>%
+output_win <- output_scores %>%
+  layer_batch_normalization() %>% 
+  layer_dense(n_outputs_scores, activation = "relu") %>%
   layer_dense(n_outputs_win, activation = "softmax", name = "output_win")
 
 
@@ -264,43 +305,56 @@ model <- keras_model(inputs = list(input_p1,input_p2,input_match), outputs = lis
 
 model %>% compile(
   loss = c("binary_crossentropy",'mae','mae'), # We have 0-1 classification...
-  loss_weights = c(2,3,1),
+  loss_weights = c(1,1,2),
   optimizer = 'adagrad' # To be investigated
   #metrics = c("binary_accuracy")  
   #metrics = "binary_accuracy"  
 )
 
 data_match <- as.matrix(m_info)
-split <- sample(nrow(data_match),200)
+split <- sample(nrow(data_match),900)
 
-data_val <- list(data_p1[split,], data_p2[split,], data_match[split,])
-data_train <- list(data_p1[-split,], data_p2[-split,], data_match[-split,])
+#data_val <- list(data_p1[split,], data_p2[split,], data_match[split,])
+#data_train <- list(data_p1[-split,], data_p2[-split,], data_match[-split,])
 #data_train <- list(data_p1,data_p2,data_match)
 #predict(model, list(data_p1[1:2,],data_p2[1:2,],data_match[1:2,]))
 
-response_val <- list(response_win[split,],response_scores[split,],response_stats[split,])
-response_train <- list(response_win[-split,],response_scores[-split,],response_stats[-split,])
+#response_val <- list(response_win[split,],response_scores[split,],response_stats[split,])
+#response_train <- list(response_win[-split,],response_scores[-split,],response_stats[-split,])
 #response_train <- list(response_win,response_scores,response_stats)
 
-history1 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
-history2 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
-history3 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
-history3 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 70, validation_data = list(data_val, response_val), view_metrics = FALSE)
 
-plot(history1)
-plot(history2)
-
-preds <- predict(model, list(data_p1[1:2,],data_p2[1:2,],data_match[1:2,]))
-rbind(response_win[1,],
-  preds[[1]][1,])
-rbind(response_scores[1,],
-      preds[[2]][1,])
-rbind(response_stats[1,],
-  preds[[3]][1,])
+history <- model %>% fit(x = list(data_p1[-split,], data_p2[-split,], data_match[-split,]),
+              y = list(response_win[-split,],response_scores[-split,],response_stats[-split,]),
+              batch_size = 1024, epochs = 50,
+              validation_data = list(list(data_p1[split,], data_p2[split,], data_match[split,]),
+                                     list(response_win[split,],response_scores[split,],response_stats[split,])),
+              view_metrics = FALSE,
+              callbacks = callback_model_checkpoint("Modeling/Lstm/checkpoints.hdf5", monitor = "val_output_win_loss", save_best_only = TRUE, verbose = 0, period = 1))
 
 
-sub_model <- keras_model(inputs = list(input_p1,input_p2,input_match), outputs = list(output_win))
-pred_win <- predict(sub_model, list(data_p1,data_p2,data_match))
-mean(response_win[,1] == round(pred_win[,1]))
 
-#cbind(response_win,response_scores,response_stats)[1,]
+#history1 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
+#history2 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
+#history3 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
+#history4 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 70, validation_data = list(data_val, response_val), view_metrics = FALSE)
+#plot(history1)
+#plot(history2)
+#plot(history3)
+#plot(history4)
+
+
+# preds <- predict(model, list(data_p1[1:2,],data_p2[1:2,],data_match[1:2,]))
+# rbind(response_win[1,],
+#   preds[[1]][1,])
+# rbind(response_scores[1,],
+#       preds[[2]][1,])
+# rbind(response_stats[1,],
+#   preds[[3]][1,])
+# 
+# 
+# sub_model <- keras_model(inputs = list(input_p1,input_p2,input_match), outputs = list(output_win))
+# pred_win <- predict(sub_model, data_val)
+# mean(response_win[,1] == round(pred_win[,1]))
+# 
+# #cbind(response_win,response_scores,response_stats)[1,]
