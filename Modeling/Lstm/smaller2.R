@@ -213,7 +213,7 @@ ff1 <- input2 %>%
   layer_batch_normalization()
 
 gru1 <- ff1 %>%
-  layer_gru(units = ceiling(n_inputs_lstm/15), activation = "relu", return_sequences = TRUE) %>%
+  layer_gru(units = ceiling(n_inputs_lstm/15), recurrent_activation = "softsign",activation = "relu", return_sequences = TRUE) %>%
   layer_batch_normalization()
 
 ff2 <- gru1 %>%
@@ -227,7 +227,7 @@ ff2 <- gru1 %>%
   layer_batch_normalization()
 
 gru2 <- layer_concatenate(list(ff1,ff2)) %>%
-  layer_gru(units = ceiling(n_inputs_lstm/15), activation = "relu", dropout = d_rate/2, return_sequences = TRUE) %>%
+  layer_gru(units = ceiling(n_inputs_lstm/15), recurrent_activation = "softsign", activation = "relu", dropout = d_rate/2, return_sequences = TRUE) %>%
   layer_batch_normalization()
 
 ff3 <- layer_concatenate(list(gru1,gru2))  %>% 
@@ -241,7 +241,7 @@ ff3 <- layer_concatenate(list(gru1,gru2))  %>%
   layer_batch_normalization()
 
 gru3 <- layer_concatenate(list(ff2,ff3))  %>% 
-  layer_gru(units = ceiling(n_inputs_lstm/15), activation = "relu", dropout = d_rate/4) %>%
+  layer_gru(units = ceiling(n_inputs_lstm/15), recurrent_activation = "softsign", activation = "relu", dropout = d_rate/4) %>%
   layer_batch_normalization()
 
 ff4 <- layer_concatenate(list(input1,gru3)) %>%
@@ -284,7 +284,7 @@ model <- keras_model(inputs = list(input1,input2), outputs = list(output_stats,o
 model %>% compile(
   loss = c('mse','mse',"binary_crossentropy"), # We have 0-1 classification...
   loss_weights = c(1,1,1),
-  optimizer = 'adam', # To be investigated
+  optimizer = 'adagrad', # To be investigated
   metrics = c("binary_accuracy")  
   #metrics = c("mse") 
   #metrics = c("mse","binary_accuracy") 

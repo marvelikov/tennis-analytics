@@ -135,8 +135,9 @@ n_inputs <- ncol(m_is) + 2*ncol(p_is)
 
 
 # This constructs the appropriate data sequences
-mat_list <- lapply(1:nrow(p_info), function(i){
-  if(i %% 2000 == 0){
+#mat_list <- lapply(1:nrow(p_info), function(i){
+vec_list <- lapply(1:nrow(p_info), function(i){
+if(i %% 2000 == 0){
     print(i)
   }
   
@@ -145,7 +146,8 @@ mat_list <- lapply(1:nrow(p_info), function(i){
   
   
   if(length(trail)==0){
-    matrix(0,n_timesteps,n_inputs)
+    #matrix(0,n_timesteps,n_inputs)
+    c(t(matrix(0,n_timesteps,n_inputs)))
   }else if(length(trail) < n_timesteps){
     trail <- rev(trail[1:min(c(length(trail),n_timesteps))])
     len_pad <- n_timesteps - length(trail)
@@ -155,7 +157,8 @@ mat_list <- lapply(1:nrow(p_info), function(i){
     }))
     
     
-    rbind(matrix(0,len_pad,n_inputs),cbind(m_is[ceiling(trail/2),,drop = FALSE],p_is[trail,,drop = FALSE],p_is[trail2,,drop = FALSE]))
+    #rbind(matrix(0,len_pad,n_inputs),cbind(m_is[ceiling(trail/2),,drop = FALSE],p_is[trail,,drop = FALSE],p_is[trail2,,drop = FALSE]))
+    c(t(rbind(matrix(0,len_pad,n_inputs),cbind(m_is[ceiling(trail/2),,drop = FALSE],p_is[trail,,drop = FALSE],p_is[trail2,,drop = FALSE]))))
   }else{
     trail <- rev(trail[1:min(c(length(trail),n_timesteps))])
 
@@ -163,7 +166,8 @@ mat_list <- lapply(1:nrow(p_info), function(i){
       j+1-2*(j %% 2 == 0)
     }))
     
-    cbind(m_is[ceiling(trail/2),],p_is[trail,],p_is[trail2,])
+    #cbind(m_is[ceiling(trail/2),],p_is[trail,],p_is[trail2,])
+    c(t(cbind(m_is[ceiling(trail/2),],p_is[trail,],p_is[trail2,])))
   }
 })
 
@@ -173,11 +177,15 @@ mat_list <- lapply(1:nrow(p_info), function(i){
 #data3d <- aperm(data3d, c(3,1,2))
 #dim(data3d)
 
+data <- do.call(rbind,vec_list)
+
 # randomize winner/loser
 p1_win <- sample(0:1,nrow(m_is), replace = TRUE)
 #data4d <- abind( list(data3d[2*(1:nrow(m_is)) - p1_win,,], data3d[2*(1:nrow(m_info)) - 1 + p1_win,,]), along=4)
-data_p1 <- data3d[2*(1:nrow(m_is)) - p1_win,,]
-data_p2 <- data3d[2*(1:nrow(m_info)) - 1 + p1_win,,]
+#data_p1 <- data3d[2*(1:nrow(m_is)) - p1_win,,]
+#data_p2 <- data3d[2*(1:nrow(m_info)) - 1 + p1_win,,]
+data_p1 <- data[2*(1:nrow(m_is)) - p1_win,]
+data_p2 <- data[2*(1:nrow(m_info)) - 1 + p1_win,]
 
 
 # construct responses
@@ -191,74 +199,73 @@ response_scores <- as.matrix(cbind(p_stats[2*(1:nrow(m_info)) - p1_win, 14:18], 
 response_stats <- as.matrix(cbind(m_stats,p_stats[2*(1:nrow(m_info)) - p1_win, 2:13], p_stats[2*(1:nrow(m_info)) - 1 + p1_win, 2:13]))
 
 
-# construct input layer
-input_p1 <- layer_input(shape=c(n_timesteps,n_inputs))
-input_p2 <- layer_input(shape=c(n_timesteps,n_inputs))
+input_p1 <- layer_input(shape=c(n_timesteps*n_inputs))
+input_p2 <- layer_input(shape=c(n_timesteps*n_inputs))
 
-# construct the 2 lstms
 
-ff1 <- layer_input(shape=c(n_timesteps,n_inputs)) %>%
+
+reshape <- layer_reshape(target_shape = c(n_timesteps, n_inputs))
+shared_ff1 <- layer_dense(units = ceiling(n_inputs), activation = "relu", input_shape = c(n_timesteps*n_inputs))
+shared_ff2 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
+shared_ff3 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
+shared_ff4 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
+shared_ff5 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
+shared_ff6 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
+
+#%>%
+#  layer_dense(units = ceiling(n_inputs), activation = "relu") %>%
+#  layer_dense(ceiling(n_inputs/2), activation = "relu") %>%
+#  layer_dense(ceiling(n_inputs/3), activation = "relu") %>%
+#  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+#  layer_batch_normalization()
+
+gru1 <- layer_gru(units = ceiling(n_inputs/4), activation = "relu", return_sequences = TRUE)
+gru2 <- layer_gru(units = ceiling(n_inputs/4), activation = "relu")
+
+ff2 <- layer_input(shape=c(n_timesteps,n_inputs)) %>%
   layer_batch_normalization() %>%
-  layer_dense(ceiling(n_inputs), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/2), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/3), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu")
+  
+gru2 <- layer_input(shape=c(n_timesteps,n_inputs)) %>%
+  layer_batch_normalization() %>%
+  layer_gru(ceiling(n_inputs/4), activation = "relu", return_sequences = TRUE) %>%
+  layer_gru(ceiling(n_inputs/4), activation = "relu", return_sequences = TRUE)
+
+
+
+block1_p1 <- input_p1 %>% reshape %>% shared_ff1 %>% shared_ff2 %>% shared_ff3 %>% gru1
+block1_p2 <- input_p2 %>% reshape %>% shared_ff1 %>% shared_ff2 %>% shared_ff3 %>% gru1
+
+block2_p1 <- block1_p1 %>% shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% gru2
+block2_p2 <- block1_p2 %>% shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% gru2
+
+
+ff7 <- layer_subtract(list(block2_p1,block2_p2)) %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
   layer_dense(ceiling(n_inputs/4), activation = "relu")
 
-ff1_p1 <- input_p1
-ff1_p2 <- input_p2 %>% ff1
 
-
-gru1 <- ff1 %>%
-  layer_batch_normalization() %>%
-  layer_gru(ceiling(n_inputs/4), input_shape = list(n_timesteps, n_inputs, 2), activation = "relu", return_sequences = TRUE) %>%
-  layer_gru(ceiling(n_inputs/4), input_shape = list(n_timesteps, n_inputs, 2), activation = "relu", return_sequences = TRUE)
-
-
-output_lstm2 <- input_lstm2 %>% 
-  layer_reshape(target_shape = c(n_timesteps, n_inputs_lstm+1)) %>%
-  #layer_gru(units = n_inputs_lstm/5, dropout = .05, return_sequences = TRUE) %>%
-  #layer_gru(units = n_inputs_lstm/5, dropout = .05, return_sequences = TRUE) %>%
-  layer_gru(units = 2*n_inputs_lstm, recurrent_dropout = .05, dropout = .05) %>%
-  layer_dense(2*n_inputs_lstm, activation = "tanh") %>%
-  layer_dense(2*n_inputs_lstm, activation = "tanh", name = "output_lstm2")
-
-# output_lstm3 <- input_lstm3 %>% 
-#   layer_reshape(target_shape = c(n_timesteps2, n_inputs_lstm)) %>%
-#   layer_lstm(units = n_inputs_lstm, activation = "tanh", return_sequences = TRUE) %>%
-#   layer_lstm(units = n_inputs_lstm, activation = "tanh", return_sequences = TRUE) %>%
-#   layer_lstm(units = n_inputs_lstm, activation = "tanh", name = "output_lstm3")
-
-
-# concatenate them in a ff
-
-output_now <- input_now %>%
-  layer_dense(n_inputs_now, activation = "sigmoid")
-
-#output_ff <- layer_concatenate(list(output_now,output_lstm1,output_lstm2,output_lstm3)) %>%
-output_ff <- layer_concatenate(list(output_now,output_lstm1,output_lstm2)) %>%
-  layer_dense(n_inputs_now + 2*n_inputs_lstm/5, activation = "tanh") %>%
-  layer_dense(2*n_inputs_lstm/5, activation = "tanh") %>%
-  layer_dense(n_inputs_lstm/5, activation = "tanh") %>%
-  layer_dense(n_inputs_lstm/5, activation = "tanh") %>%
-  layer_dense(n_inputs_lstm/5, activation = "tanh") %>%
-  layer_dense(n_inputs_lstm/5, activation = "tanh") %>%
-  layer_dense(ceiling(n_inputs_lstm/7), activation = "sigmoid", name = "output_ff") 
-
-output_win <- output_ff %>%
+output_win <- ff7 %>%
+  layer_dense(ceiling(n_inputs/8), activation = "relu") %>%
   layer_dense(n_outputs_win, activation = "softmax", name = "output_win")
 
-output_scores <- output_ff %>%
-  layer_dense(n_outputs_scores, activation = "sigmoid", name = "output_scores")
+output_scores <- ff7 %>%
+  layer_dense(ceiling(n_inputs/8), activation = "relu") %>%
+  layer_dense(n_outputs_scores, activation = "relu", name = "output_scores")
 
-output_stats <- output_ff %>%
-  layer_dense(n_outputs_stats, activation = "sigmoid", name = "output_stats")
+output_stats <- ff7 %>%
+  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+  layer_dense(n_outputs_stats, activation = "relu", name = "output_stats")
 
 
+model <- keras_model(inputs = list(data_p1,data_p2), outputs = list(response_win,response_scores,response_stats))
 
-
-
-#model <- keras_model(inputs = list(input_now,input_lstm1,input_lstm2,input_lstm3), outputs = list(output_win,output_scores,output_stats))
-model <- keras_model(inputs = list(input_now,input_lstm1,input_lstm2), outputs = list(output_win,output_scores,output_stats))
+model <- keras_model(inputs = list(data_p1,data_p2), outputs = output)
 model %>% compile(
   loss = c("categorical_crossentropy",'mse','mse'), # We have 0-1 classification...
   loss_weights = c(1,.01,.01),
