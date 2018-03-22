@@ -123,7 +123,7 @@ trails <- sapply(1:max(p_info$id), function(the_id){
 
 # number of timesteps for the two different kind of streams we have 
 
-n_timesteps <- 3
+n_timesteps <- 20
 
 
 # construct data
@@ -201,90 +201,106 @@ response_stats <- as.matrix(cbind(m_stats,p_stats[2*(1:nrow(m_info)) - p1_win, 2
 
 input_p1 <- layer_input(shape=c(n_timesteps*n_inputs))
 input_p2 <- layer_input(shape=c(n_timesteps*n_inputs))
+#input_match <- layer_input(shape=c(ncol(m_info) + 2*ncol(p_info[,-1])))
+input_match <- layer_input(shape=c(ncol(m_info)))
 
 
 
 reshape <- layer_reshape(target_shape = c(n_timesteps, n_inputs))
-shared_ff1 <- layer_dense(units = ceiling(n_inputs), activation = "relu", input_shape = c(n_timesteps*n_inputs))
-shared_ff2 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
-shared_ff3 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
-shared_ff4 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
-shared_ff5 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
-shared_ff6 <- layer_dense(units = ceiling(n_inputs), activation = "relu")
+shared_ff1 <- layer_dense(units = ceiling(n_inputs/2), activation = "relu")
+shared_ff2 <- layer_dense(units = ceiling(n_inputs/3), activation = "relu")
+shared_ff3 <- layer_dense(units = ceiling(n_inputs/6), activation = "relu")
+shared_ff4 <- layer_dense(units = ceiling(n_inputs/6), activation = "relu", input_shape = c(35))
+shared_ff5 <- layer_dense(units = ceiling(n_inputs/8), activation = "relu", input_shape = c(35))
+shared_ff6 <- layer_dense(units = ceiling(n_inputs/8), activation = "relu", input_shape = c(35))
 
-#%>%
-#  layer_dense(units = ceiling(n_inputs), activation = "relu") %>%
-#  layer_dense(ceiling(n_inputs/2), activation = "relu") %>%
-#  layer_dense(ceiling(n_inputs/3), activation = "relu") %>%
-#  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
-#  layer_batch_normalization()
 
-gru1 <- layer_gru(units = ceiling(n_inputs/4), activation = "relu", return_sequences = TRUE)
-gru2 <- layer_gru(units = ceiling(n_inputs/4), activation = "relu")
+gru1 <- layer_gru(units = ceiling(n_inputs/8), activation = "relu", return_sequences = TRUE)
+#gru1 <- layer_gru(units = ceiling(n_inputs/8), activation = "relu")
+gru2 <- layer_gru(units = ceiling(n_inputs/10), activation = "relu")
 
-ff2 <- layer_input(shape=c(n_timesteps,n_inputs)) %>%
+
+block1_p1 <- input_p1 %>%
+  reshape %>% layer_masking(mask_value = 0) %>% layer_batch_normalization() %>%
+  shared_ff1 %>% layer_dropout(.1) %>%  shared_ff2 %>% shared_ff3 %>%
+  layer_batch_normalization() %>% gru1
+
+block1_p2 <- input_p2 %>%
+  reshape %>% layer_masking(mask_value = 0) %>% layer_batch_normalization() %>%
+  shared_ff1 %>% layer_dropout(.1) %>% shared_ff2 %>% shared_ff3 %>%
+  layer_batch_normalization() %>% gru1
+
+
+block2_p1 <- block1_p1 %>%  layer_batch_normalization() %>% #shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% 
+  gru2
+block2_p2 <- block1_p2 %>%  layer_batch_normalization() %>% #shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% 
+  gru2
+
+
+ff7 <- layer_concatenate(list(input_match ,layer_subtract(list(block2_p1,block2_p2)))) %>%
   layer_batch_normalization() %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu")
-  
-gru2 <- layer_input(shape=c(n_timesteps,n_inputs)) %>%
-  layer_batch_normalization() %>%
-  layer_gru(ceiling(n_inputs/4), activation = "relu", return_sequences = TRUE) %>%
-  layer_gru(ceiling(n_inputs/4), activation = "relu", return_sequences = TRUE)
-
-
-
-block1_p1 <- input_p1 %>% reshape %>% shared_ff1 %>% shared_ff2 %>% shared_ff3 %>% gru1
-block1_p2 <- input_p2 %>% reshape %>% shared_ff1 %>% shared_ff2 %>% shared_ff3 %>% gru1
-
-block2_p1 <- block1_p1 %>% shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% gru2
-block2_p2 <- block1_p2 %>% shared_ff4 %>% shared_ff5 %>% shared_ff6 %>% gru2
-
-
-ff7 <- layer_subtract(list(block2_p1,block2_p2)) %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu")
-
-
-output_win <- ff7 %>%
   layer_dense(ceiling(n_inputs/8), activation = "relu") %>%
-  layer_dense(n_outputs_win, activation = "softmax", name = "output_win")
-
-output_scores <- ff7 %>%
+  layer_dropout(.1) %>%
   layer_dense(ceiling(n_inputs/8), activation = "relu") %>%
-  layer_dense(n_outputs_scores, activation = "relu", name = "output_scores")
+  layer_dropout(.1) %>%
+  layer_dense(ceiling(n_inputs/8), activation = "relu")
+
 
 output_stats <- ff7 %>%
-  layer_dense(ceiling(n_inputs/4), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/10), activation = "relu") %>%
   layer_dense(n_outputs_stats, activation = "relu", name = "output_stats")
 
+output_scores <- layer_concatenate(list(ff7,output_stats)) %>%
+  layer_dense(ceiling(n_inputs/15), activation = "relu") %>%
+  layer_dense(n_outputs_scores, activation = "relu", name = "output_scores")
 
-model <- keras_model(inputs = list(data_p1,data_p2), outputs = list(response_win,response_scores,response_stats))
+output_win <- layer_concatenate(list(output_stats,output_scores)) %>%
+  layer_dense(ceiling(n_inputs/15), activation = "relu") %>%
+  layer_dense(ceiling(n_inputs/15), activation = "relu") %>%
+  layer_dense(n_outputs_win, activation = "softmax", name = "output_win")
 
-model <- keras_model(inputs = list(data_p1,data_p2), outputs = output)
+
+model <- keras_model(inputs = list(input_p1,input_p2,input_match), outputs = list(output_win,output_scores,output_stats))
+
 model %>% compile(
-  loss = c("categorical_crossentropy",'mse','mse'), # We have 0-1 classification...
-  loss_weights = c(1,.01,.01),
-  optimizer = 'sgd', # To be investigated
+  loss = c("binary_crossentropy",'mae','mae'), # We have 0-1 classification...
+  loss_weights = c(2,3,1),
+  optimizer = 'adagrad' # To be investigated
   #metrics = c("binary_accuracy")  
-  metrics = "binary_accuracy"  
+  #metrics = "binary_accuracy"  
 )
-predict(model, list(matrix(data_now[1,], nrow = 1),matrix(data_trail_p1[1,], nrow = 1),matrix(data_trail_p2[1,], nrow = 1)))
-#model %>% fit(x = list(data_now, data_trail_p1, data_trail_p2, data_trail_past), y = list(response_win,response_scores,response_stats), batch_size = 512, epochs = 3, validation_split = .05)
 
-split <- sample(nrow(data_now),300)
-data_val <- list(data_now[split,], data_trail_p1[split,], data_trail_p2[split,])
-data_train <- list(data_now[-split,], data_trail_p1[-split,], data_trail_p2[-split,])
+data_match <- as.matrix(m_info)
+split <- sample(nrow(data_match),200)
+
+data_val <- list(data_p1[split,], data_p2[split,], data_match[split,])
+data_train <- list(data_p1[-split,], data_p2[-split,], data_match[-split,])
+#data_train <- list(data_p1,data_p2,data_match)
+#predict(model, list(data_p1[1:2,],data_p2[1:2,],data_match[1:2,]))
 
 response_val <- list(response_win[split,],response_scores[split,],response_stats[split,])
 response_train <- list(response_win[-split,],response_scores[-split,],response_stats[-split,])
+#response_train <- list(response_win,response_scores,response_stats)
 
-model %>% fit(x = data_train, y = response_train, batch_size = 512, epochs = 20, validation_split = .05, view_metrics = FALSE)
+history1 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
+history2 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
+history3 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 10, validation_data = list(data_val, response_val), view_metrics = FALSE)
+history3 <- model %>% fit(x = data_train, y = response_train, batch_size = 1024, epochs = 70, validation_data = list(data_val, response_val), view_metrics = FALSE)
+
+plot(history1)
+plot(history2)
+
+preds <- predict(model, list(data_p1[1:2,],data_p2[1:2,],data_match[1:2,]))
+rbind(response_win[1,],
+  preds[[1]][1,])
+rbind(response_scores[1,],
+      preds[[2]][1,])
+rbind(response_stats[1,],
+  preds[[3]][1,])
 
 
-preds <- predict(model, data_val)[[1]]
-mean(round(preds[,1]) == response_val[[1]][,1])
+sub_model <- keras_model(inputs = list(input_p1,input_p2,input_match), outputs = list(output_win))
+pred_win <- predict(sub_model, list(data_p1,data_p2,data_match))
+mean(response_win[,1] == round(pred_win[,1]))
+
+#cbind(response_win,response_scores,response_stats)[1,]
