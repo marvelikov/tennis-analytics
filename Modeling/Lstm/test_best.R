@@ -1,4 +1,4 @@
-best_model <- load_model_hdf5("Modeling/Lstm/checkpoints.hdf5")
+best_model <- load_model_hdf5("Modeling/Lstm/checkpoint2.hdf5")
 
 preds <- predict(model, list(data_p1[split,], data_p2[split,], data_match[split,]))
 rbind(response_win[split[1],],

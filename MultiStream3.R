@@ -16,7 +16,7 @@ data_match <- as.matrix(m_info)
 # construct responses
 n_outputs_win <- 1
 n_outputs_scores <- 2*5
-n_outputs_scores <- 5
+#n_outputs_scores <- 5
 n_outputs_stats <- ncol(m_stats) + 2*(ncol(p_stats)-6)
 
 #response_win <- cbind(p1_win,1-p1_win)
@@ -124,7 +124,7 @@ split <- sample(nrow(data_match),900)
 
 history <- model %>% fit(x = list(data_p1[-split,], data_p2[-split,], data_match[-split,]),
               y = list(response_win[-split,],response_scores[-split,],response_stats[-split,]),
-              batch_size = 1024, epochs = 50,
+              batch_size = 1024, epochs = 10,
               validation_data = list(list(data_p1[split,], data_p2[split,], data_match[split,]),
                                      list(response_win[split,],response_scores[split,],response_stats[split,])),
               view_metrics = FALSE,
